@@ -1,4 +1,7 @@
 .vs/
-MeetingRoom.API/bin/
-MeetingRoom.API/obj/Debug/
-bin/
+**/bin/
+**/obj/
+**/Debug/
+**/Release/
+**/bin/**
+**/obj/**
