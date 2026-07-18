@@ -1,15 +1,16 @@
-﻿using MeetingRoom.API.Persistance;
+﻿using MeetingRoom.API.DTOs;
+using MeetingRoom.API.Persistance;
 
 namespace MeetingRoom.API.Services
 {
     public interface IBookingService
     {
-        void CreateBooking(Booking booking);
-        Booking UpdateBooking(Booking booking);
-        void DeleteBooking(int bookingId);
-        IEnumerable<Booking> GetBookings();
-        Booking GetBookingById(int bookingId);
+        Task<BookingDTO> CreateBooking(CreateBookingDTO booking);
+        Task<BookingDTO> UpdateBooking(UpdateBookingDTO booking);
+        Task DeleteBookingAsync(int bookingId);
+        Task<IEnumerable<BookingDTO>> GetBookings();
+        Task<BookingDTO?> GetBookingById(int bookingId);
         void ValidateBooking(Booking booking);
-        IEnumerable<Room> GetRooms();
+        Task<IEnumerable<RoomDTO>> GetRooms();
     }
 }

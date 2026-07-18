@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MeetingRoom.API.Persistance;
 using MeetingRoom.API.Services;
+using MeetingRoom.API.DTOs;
 
 namespace MeetingRoom.Tests
 {
@@ -46,10 +47,10 @@ namespace MeetingRoom.Tests
         //===================================================================================================================
 
         [TestMethod]
-        public void GetRooms_ReturnsAllRooms()
+        public async Task GetRooms_ReturnsAllRooms()
         {
             // Act
-            var rooms = _bookingService.GetRooms();
+            var rooms = await _bookingService.GetRooms();
 
             // Assert
             Assert.IsNotNull(rooms);
@@ -57,10 +58,10 @@ namespace MeetingRoom.Tests
         }
 
         [TestMethod]
-        public void GetRooms_ReturnsRoomsWithCorrectData()
+        public async Task GetRooms_ReturnsRoomsWithCorrectData()
         {
             // Act
-            var rooms = _bookingService.GetRooms().ToList();
+            var rooms = (List<RoomDTO>) await _bookingService.GetRooms();
 
             // Assert
             Assert.AreEqual("Party Room A", rooms[0].Name);
@@ -75,7 +76,7 @@ namespace MeetingRoom.Tests
         //===================================================================================================================
 
         [TestMethod]
-        public void ValidateBooking_ThrowsException_WhenRoomDoesNotExist()
+        public async Task ValidateBooking_ThrowsException_WhenRoomDoesNotExist()
         {
             // Arrange
             var booking = new Booking
@@ -91,7 +92,7 @@ namespace MeetingRoom.Tests
         }
 
         [TestMethod]
-        public void ValidateBooking_ThrowsException_WhenStartTimeAfterEndTime()
+        public async Task ValidateBooking_ThrowsException_WhenStartTimeAfterEndTime()
         {
             // Arrange
             var booking = new Booking
@@ -107,7 +108,7 @@ namespace MeetingRoom.Tests
         }
 
         [TestMethod]
-        public void ValidateBooking_ThrowsException_WhenBookingTitleIsEmpty()
+        public async Task ValidateBooking_ThrowsException_WhenBookingTitleIsEmpty()
         {
             // Arrange
             var booking = new Booking
@@ -128,10 +129,10 @@ namespace MeetingRoom.Tests
         //===================================================================================================================
 
         [TestMethod]
-        public void CreateBooking_SuccessfullyCreatesBooking()
+        public async Task CreateBooking_SuccessfullyCreatesBooking()
         {
             // Arrange
-            var booking = new Booking
+            var booking = new CreateBookingDTO
             {
                 Title = "Boring Meeting",
                 RoomId = 1,
@@ -140,15 +141,15 @@ namespace MeetingRoom.Tests
             };
 
             // Act
-            _bookingService.CreateBooking(booking);
-            var bookings = _bookingService.GetBookings().ToList();
+            await _bookingService.CreateBooking(booking);
+            var bookings = await _bookingService.GetBookings();
 
             // Assert
             Assert.IsNotEmpty(bookings);
         }
 
         [TestMethod]
-        public void CreateBooking_ThrowsException_WhenBookingConflicts()
+        public async Task CreateBooking_ThrowsException_WhenBookingConflicts()
         {
             // Arrange
             var startTime = DateTime.Now.AddHours(1);
@@ -167,7 +168,7 @@ namespace MeetingRoom.Tests
             _context.SaveChanges();
 
             // Act & Assert - Try to create overlapping booking
-            var booking2 = new Booking
+            var booking2 = new CreateBookingDTO
             {
                 Title = "Discussion on why so many Meetings",
                 RoomId = 1,
@@ -180,7 +181,7 @@ namespace MeetingRoom.Tests
         }
 
         [TestMethod]
-        public void BookingConflict_IsNotDetected_WhenBookingsAreInDifferentRooms()
+        public async Task BookingConflict_IsNotDetected_WhenBookingsAreInDifferentRooms()
         {
             // Arrange
             var startTime = DateTime.Now.AddDays(1).Date.AddHours(10);
@@ -198,7 +199,7 @@ namespace MeetingRoom.Tests
             _context.SaveChanges();
 
             // Act - Same time, different room
-            var booking2 = new Booking
+            var booking2 = new CreateBookingDTO
             {
                 Title = "I'm double booked",
                 RoomId = 2,
@@ -207,7 +208,7 @@ namespace MeetingRoom.Tests
             };
 
             // Assert - Should not throw
-            _bookingService.CreateBooking(booking2);
+            await _bookingService.CreateBooking(booking2);
         }
         #endregion
 
@@ -215,10 +216,10 @@ namespace MeetingRoom.Tests
         //===================================================================================================================
 
         [TestMethod]
-        public void GetBookings_ReturnsEmptyList_WhenNoBookingsExist()
+        public async Task GetBookings_ReturnsEmptyList_WhenNoBookingsExist()
         {
             // Act
-            var bookings = _bookingService.GetBookings();
+            var bookings = await _bookingService.GetBookings();
 
             // Assert
             Assert.IsNotNull(bookings);
@@ -226,7 +227,7 @@ namespace MeetingRoom.Tests
         }
 
         [TestMethod]
-        public void GetBookings_ReturnsAllBookings_WhenBookingsExist()
+        public async Task GetBookings_ReturnsAllBookings_WhenBookingsExist()
         {
             // Arrange
             var booking1 = new Booking
@@ -249,12 +250,13 @@ namespace MeetingRoom.Tests
             _context.SaveChanges();
 
             // Act
-            var bookings = _bookingService.GetBookings().ToList();
+            var bookings = (List<BookingDTO>) await _bookingService.GetBookings();
 
             // Assert
             Assert.HasCount(2, bookings);
-            Assert.AreEqual("Why are managers like this Meeting", bookings[0].Title);
-            Assert.AreEqual("Meeting to interrupt devs' flow state", bookings[1].Title);
+            //** I also wanna check here that bookings are ordered by start time  
+            Assert.IsTrue(bookings.Any(b => b.Title == "Why are managers like this Meeting"));
+            Assert.IsTrue(bookings.Any(b => b.Title == "Meeting to interrupt devs' flow state"));
         }
 
         #endregion
@@ -263,7 +265,7 @@ namespace MeetingRoom.Tests
         //===================================================================================================================
 
         [TestMethod]
-        public void GetBookingById_ReturnsCorrectBooking()
+        public async Task GetBookingById_ReturnsCorrectBooking()
         {
             // Arrange
             var booking = new Booking
@@ -278,7 +280,7 @@ namespace MeetingRoom.Tests
             _context.SaveChanges();
 
             // Act
-            var retrievedBooking = _bookingService.GetBookingById(booking.Id);
+            var retrievedBooking = await _bookingService.GetBookingById(booking.Id);
 
             // Assert
             Assert.IsNotNull(retrievedBooking);
@@ -287,10 +289,10 @@ namespace MeetingRoom.Tests
         }
 
         [TestMethod]
-        public void GetBookingById_ReturnsNull_WhenBookingDoesNotExist()
+        public async Task GetBookingById_ReturnsNull_WhenBookingDoesNotExist()
         {
             // Act
-            var booking = _bookingService.GetBookingById(999);
+            var booking = await _bookingService.GetBookingById(999);
 
             // Assert
             Assert.IsNull(booking);
@@ -302,7 +304,7 @@ namespace MeetingRoom.Tests
         //===================================================================================================================
 
         [TestMethod]
-        public void UpdateBooking_SuccessfullyUpdatesBooking()
+        public async Task UpdateBooking_SuccessfullyUpdatesBooking()
         {
             // Arrange
             var originalBooking = new Booking
@@ -319,7 +321,7 @@ namespace MeetingRoom.Tests
 
             var bookingId = originalBooking.Id;
 
-            var bookingUpdate = new Booking
+            var bookingUpdate = new UpdateBookingDTO
             {
                 Id = 420,
                 Title = "New Improved Meeting",
@@ -330,8 +332,8 @@ namespace MeetingRoom.Tests
 
 
             // Act
-            var updatedBooking = _bookingService.UpdateBooking(bookingUpdate);
-            var updatedBookingFromGet = _bookingService.GetBookingById(bookingId);
+            var updatedBooking = await _bookingService.UpdateBooking(bookingUpdate);
+            var updatedBookingFromGet = await _bookingService.GetBookingById(bookingId);
 
             // Assert
             Assert.IsNotNull(updatedBooking);
@@ -346,7 +348,7 @@ namespace MeetingRoom.Tests
         //===================================================================================================================
 
         [TestMethod]
-        public void DeleteBooking_SuccessfullyDeletesBooking()
+        public async Task DeleteBooking_SuccessfullyDeletesBooking()
         {
             // Arrange
             var booking = new Booking
@@ -363,18 +365,18 @@ namespace MeetingRoom.Tests
             var bookingId = booking.Id;
 
             // Act
-            _bookingService.DeleteBooking(bookingId);
-            var deletedBooking = _bookingService.GetBookingById(bookingId);
+            await _bookingService.DeleteBookingAsync(bookingId);
+            var deletedBooking = await _bookingService.GetBookingById(bookingId);
 
             // Assert
             Assert.IsNull(deletedBooking);
         }
 
         [TestMethod]
-        public void DeleteBooking_DoesNotThrowException_WhenBookingDoesNotExist()
+        public async Task DeleteBooking_DoesNotThrowException_WhenBookingDoesNotExist()
         {
             // Act & Assert - Should not throw
-            _bookingService.DeleteBooking(666);
+            await _bookingService.DeleteBookingAsync(666);
         }
 
         #endregion
