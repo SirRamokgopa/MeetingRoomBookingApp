@@ -23,12 +23,14 @@ MeetingRoomBooking.Api/
 |    |----MeetingRoomDbContext
 |    |----BookingRepository
 |----Validators/
+|----Data/
+|----|----Sqlite
+|----|----SeedData
+|----|----Migrations
 
 Tests/
+|----BookinServiceTests
 
-Data/
-|----Sqlite
-|----SeedData
 
 meeting-room-client/
 |----Components/
