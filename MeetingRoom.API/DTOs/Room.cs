@@ -2,8 +2,8 @@
 {
     public class RoomDTO
     {
-        public int Id;
-        public string Name = string.Empty;
-        public int Capacity;
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public int Capacity { get; set; }
     }
 }

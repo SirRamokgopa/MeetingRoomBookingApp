@@ -15,6 +15,7 @@ builder.Services.AddControllers();
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo { Title = "MeetingRoom.API", Version = "v1" });
+    options.EnableAnnotations();
 });
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

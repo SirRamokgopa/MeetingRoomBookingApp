@@ -6,14 +6,14 @@ namespace MeetingRoom.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class RoomsController(IBookingService bookingService) : Controller
+    public class RoomsController(IBookingService bookingService) : ControllerBase
     {
         private readonly IBookingService _bookingService = bookingService;
 
         [HttpGet]
-        public ActionResult<List<RoomDTO>> GetRooms()
+        public async Task<ActionResult<List<RoomDTO>>> GetRooms()
         {
-            var rooms = _bookingService.GetRooms();
+            var rooms = await _bookingService.GetRooms();
             return Ok(rooms);
         }
     }
