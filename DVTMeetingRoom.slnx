@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="MeetingRoom.API/MeetingRoom.API.csproj" />
+  <Project Path="MeetingRoom.Tests/MeetingRoom.Tests.csproj" Id="089cdb13-1ec9-4230-9a69-a95f954ac99c" />
 </Solution>

@@ -19,11 +19,18 @@ MeetingRoomBooking.Api/
 |----Services/
 |    |----BookingService
 |----Persistance/
+|    |----Models/
 |    |----MeetingRoomDbContext
 |    |----BookingRepository
-|    |----SeedData
 |----Validators/
-|----Tests/
+|----Data/
+|----|----Sqlite
+|----|----SeedData
+|----|----Migrations
+
+Tests/
+|----BookinServiceTests
+
 
 meeting-room-client/
 |----Components/

@@ -1,40 +1,70 @@
 ﻿using MeetingRoom.API.DTOs;
+using MeetingRoom.API.Persistance;
+using MeetingRoom.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MeetingRoom.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class BookingsController : Controller
+    public class BookingsController(IBookingService bookingService) : ControllerBase
     {
+        private readonly IBookingService _bookingService = bookingService;
+
         [HttpGet]
-        public ActionResult<List<BookingDTO>> GetBookings()
+        public async Task<ActionResult<List<BookingDTO>>> GetBookings()
         {
-            return Ok();
+            var bookings = await _bookingService.GetBookings();
+            return Ok(bookings);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<BookingDTO> GetBookingFromId()
+        public async Task<ActionResult<BookingDTO>> GetBooking(int id)
         {
-            return Ok();
+            var booking = await _bookingService.GetBookingById(id);
+
+            if (booking == null) return NotFound();
+
+            return Ok(booking);
         }
 
         [HttpPost]
-        public IActionResult AddBooking()
+        public async Task<ActionResult<BookingDTO>> CreateBooking([FromBody] CreateBookingDTO booking)
         {
-            return Ok();
+            if (booking == null) return BadRequest("A booking object is reqired");
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var createdBooking = await _bookingService.CreateBooking(booking);
+
+            return CreatedAtAction(
+                nameof(GetBooking),
+                new { id = createdBooking.Id },
+                createdBooking
+            );
         }
 
         [HttpPut("{id}")]
-        public IActionResult EditBooking()
+        public async Task<ActionResult<BookingDTO>> UpdateBooking(int id, [FromBody] UpdateBookingDTO booking)
         {
-            return Ok();
+            if (booking == null) return BadRequest("A booking object is reqired");
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var _ = await _bookingService.GetBookingById(id);
+
+            var updatedBooking = await _bookingService.UpdateBooking(booking);
+
+            return Ok(updatedBooking);
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteBooking()
+        public async Task<IActionResult> DeleteBooking(int id)
         {
-            return Ok();
+            var booking = await _bookingService.GetBookingById(id);
+
+            if (booking == null) return NotFound("Booking does not exist");
+
+            await _bookingService.DeleteBookingAsync(id);
+            return NoContent();
         }
     }
 }
