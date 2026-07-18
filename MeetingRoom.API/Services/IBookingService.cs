@@ -10,7 +10,7 @@ namespace MeetingRoom.API.Services
         Task DeleteBookingAsync(int bookingId);
         Task<IEnumerable<BookingDTO>> GetBookings();
         Task<BookingDTO?> GetBookingById(int bookingId);
-        void ValidateBooking(Booking booking);
+        Task ValidateBooking(Booking booking);
         Task<IEnumerable<RoomDTO>> GetRooms();
     }
 }

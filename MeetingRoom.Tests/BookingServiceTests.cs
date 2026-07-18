@@ -88,7 +88,7 @@ namespace MeetingRoom.Tests
             };
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => _bookingService.ValidateBooking(booking));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await _bookingService.ValidateBooking(booking));
         }
 
         [TestMethod]
@@ -104,7 +104,7 @@ namespace MeetingRoom.Tests
             };
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => _bookingService.ValidateBooking(booking));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await _bookingService.ValidateBooking(booking));
         }
 
         [TestMethod]
@@ -120,7 +120,7 @@ namespace MeetingRoom.Tests
             };
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => _bookingService.ValidateBooking(booking));
+            await Assert.ThrowsAsync<ArgumentException>(async () => await _bookingService.ValidateBooking(booking));
         }
 
         #endregion
@@ -177,7 +177,7 @@ namespace MeetingRoom.Tests
             };
 
             // I'm thinking we should throw a confict exception here so that we know what's going on, but for now let's just throw an ArgumentException
-            Assert.Throws<ArgumentException>(() => _bookingService.CreateBooking(booking2));
+            await Assert.ThrowsAsync<BookingConflictException>(async () => await _bookingService.CreateBooking(booking2));
         }
 
         [TestMethod]
