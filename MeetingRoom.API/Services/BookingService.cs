@@ -17,7 +17,7 @@ namespace MeetingRoom.API.Services
         public async Task<BookingDTO> CreateBooking(CreateBookingDTO booking)
         {
             var bookingEntity = booking.ToEntity();
-            ValidateBooking(bookingEntity);
+            await ValidateBooking(bookingEntity);
 
             _context.Add(bookingEntity);
             await _context.SaveChangesAsync();
@@ -37,7 +37,7 @@ namespace MeetingRoom.API.Services
 
             bookingFromDb.UpdateFromDto(booking);
 
-            ValidateBooking(bookingFromDb);
+            await ValidateBooking(bookingFromDb);
 
             await _context.SaveChangesAsync();
             return bookingFromDb.ToDto();
@@ -81,19 +81,60 @@ namespace MeetingRoom.API.Services
                 .ToListAsync();
         }
 
-        public void ValidateBooking(Booking booking)
+        public async Task ValidateBooking(Booking booking)
         {
-            // Validation logic will be implemented here
-            throw new NotImplementedException();
+            // Check that room for booking exists
+            var room = _context.Rooms.FirstOrDefault(r => r.Id == booking.RoomId);
+            if (room == null)
+            {
+                throw new ArgumentException($"Room with id {booking.RoomId} does not exist");
+            };
+
+            //Check that booking has title
+            if (booking.Title == null || booking.Title.Trim() == "" || string.IsNullOrEmpty(booking.Title))
+            {
+                throw new ArgumentException("Booking title cannot be empty");
+            }
+
+            // Check that booking start time is before end time
+            if (booking.StartTime >= booking.EndTime)
+            {
+                throw new ArgumentException("Booking start time must be before end time");
+            }
+
+            // Create new conflict booking exception with details of the conflicting booking
+            var conflictingBooking = await GetConflictingBooking(booking);
+            if (conflictingBooking is not null)
+            {
+                throw new BookingConflictException(conflictingBooking);
+            }
         }
 
-        private bool HasBookingConflict(Booking booking)
+        private async Task<Booking?> GetConflictingBooking(Booking booking)
         {
-            return _context.Bookings.Any(b =>
+            return await _context.Bookings.FirstOrDefaultAsync(b =>
                 b.RoomId == booking.RoomId &&
                 b.Id != booking.Id &&
                 b.StartTime < booking.EndTime &&
                 b.EndTime > booking.StartTime);
+        }
+    }
+
+    public class BookingConflictException : Exception
+    {
+        public int ConflictingBookingId { get; }
+        public int RoomId { get; }
+        public DateTime ConflictingStartTime { get; }
+        public DateTime ConflictingEndTime { get; }
+
+        public BookingConflictException(Booking conflictingBooking)
+            : base($"The requested time slot conflicts with an existing booking (Id: {conflictingBooking.Id}) " +
+                   $"in room {conflictingBooking.RoomId} from {conflictingBooking.StartTime} to {conflictingBooking.EndTime}.")
+        {
+            ConflictingBookingId = conflictingBooking.Id;
+            RoomId = conflictingBooking.RoomId;
+            ConflictingStartTime = conflictingBooking.StartTime;
+            ConflictingEndTime = conflictingBooking.EndTime;
         }
     }
 }
