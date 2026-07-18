@@ -1,4 +1,7 @@
+using MeetingRoom.API.DTOs;
 using MeetingRoom.API.Persistance;
+using MeetingRoom.API.Services.Mappers;
+using Microsoft.EntityFrameworkCore;
 
 namespace MeetingRoom.API.Services
 {
@@ -11,55 +14,71 @@ namespace MeetingRoom.API.Services
             _context = context;
         }
 
-        public void CreateBooking(Booking booking)
+        public async Task<BookingDTO> CreateBooking(CreateBookingDTO booking)
         {
-            // This method will be implemented to create a booking
-            // and validate it before saving
-            throw new NotImplementedException();
+            var bookingEntity = booking.ToEntity();
+            ValidateBooking(bookingEntity);
+
+            _context.Add(bookingEntity);
+            await _context.SaveChangesAsync();
+
+            return bookingEntity.ToDto();
         }
 
-        public Booking UpdateBooking(Booking booking)
+        public async Task<BookingDTO> UpdateBooking(UpdateBookingDTO booking)
         {
-            var bookingFromDb = _context.Bookings.FirstOrDefault(b => b.Id == booking.Id);
-            
+
+            var bookingFromDb = await _context.Bookings.FirstOrDefaultAsync(b => b.Id == booking.Id);
+
             if (bookingFromDb == null)
             {
                 throw new ArgumentException($"Booking with id {booking} not found");
             }
 
-            ValidateBooking(booking);
+            bookingFromDb.UpdateFromDto(booking);
 
-            _context.SaveChanges();
-            return bookingFromDb;
+            ValidateBooking(bookingFromDb);
+
+            await _context.SaveChangesAsync();
+            return bookingFromDb.ToDto();
         }
 
-        public void DeleteBooking(int bookingId)
+        public async Task DeleteBookingAsync(int bookingId)
         {
-            var booking = _context.Bookings.FirstOrDefault(b => b.Id == bookingId);
-            
+            var booking = await _context.Bookings.FirstOrDefaultAsync(b => b.Id == bookingId);
+
             if (booking != null)
             {
                 _context.Bookings.Remove(booking);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
 
             // If booking is not found do nada (Not sure if this is best yet)
         }
 
-        public IEnumerable<Booking> GetBookings()
+        public async Task<IEnumerable<BookingDTO>> GetBookings()
         {
-            return _context.Bookings.ToList();
+            var bookings = await _context.Bookings.Select(b => b.ToDto()).ToListAsync();
+            return bookings;
         }
 
-        public Booking GetBookingById(int bookingId)
+        public async Task<BookingDTO?> GetBookingById(int bookingId)
         {
-            return _context.Bookings.FirstOrDefault(b => b.Id == bookingId);
+            var booking = await _context.Bookings.FirstOrDefaultAsync(b => b.Id == bookingId);
+
+            return booking?.ToDto();
         }
 
-
-        public IEnumerable<Room> GetRooms()
+        public async Task<IEnumerable<RoomDTO>> GetRooms()
         {
-            return _context.Rooms.ToList();
+            return await _context.Rooms
+                .Select(r => new RoomDTO
+                {
+                    Id = r.Id,
+                    Name = r.Name,
+                    Capacity = r.Capacity
+                })
+                .ToListAsync();
         }
 
         public void ValidateBooking(Booking booking)
@@ -72,7 +91,7 @@ namespace MeetingRoom.API.Services
         {
             return _context.Bookings.Any(b =>
                 b.RoomId == booking.RoomId &&
-                b.Id != booking.Id && 
+                b.Id != booking.Id &&
                 b.StartTime < booking.EndTime &&
                 b.EndTime > booking.StartTime);
         }
