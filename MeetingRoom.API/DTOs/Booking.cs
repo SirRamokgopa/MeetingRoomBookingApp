@@ -2,11 +2,11 @@
 {
     public class BookingDTO
     {
-        int Id;
-        string Title;
-        int RoomId;
-        string Room;
-        DateTime StartTime;
-        DateTime EndTime;
+        public int Id;
+        public string Title = string.Empty;
+        public int RoomId;
+        public string Room = string.Empty;
+        public DateTime StartTime;
+        public DateTime EndTime;
     }
 }
