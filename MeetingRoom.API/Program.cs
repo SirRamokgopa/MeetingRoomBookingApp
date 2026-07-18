@@ -1,4 +1,5 @@
 using MeetingRoom.API.Persistance;
+using MeetingRoom.API.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 
@@ -7,6 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddDbContext<MeetingRoomContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("MeetingRoomDb")));
+
+builder.Services.AddTransient<IBookingService, BookingService>();
 
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen(options =>
