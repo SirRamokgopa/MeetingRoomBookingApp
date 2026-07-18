@@ -1,0 +1,11 @@
+name: Local
+variables:
+  - name: MeetingRoomAPI
+    value: https://localhost:7006
+  - name: Booking1
+    value: 1
+  - name: Booking2
+    value: 2
+  - name: NoBooking
+    value: 420
+  

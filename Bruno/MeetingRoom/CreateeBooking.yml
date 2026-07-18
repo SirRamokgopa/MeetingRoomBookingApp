@@ -1,0 +1,24 @@
+info:
+  name: CreateeBooking
+  type: http
+  seq: 7
+
+http:
+  method: POST
+  url: "{{MeetingRoomAPI}}/Bookings"
+  body:
+    type: json
+    data: |-
+      {
+          "Title": "That Meeting Place",
+          "RoomId": 1,
+          "StartTime": "2026-07-20T11:27:15Z",
+          "EndTime": "2026-07-20T12:27:15Z"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
