@@ -23,6 +23,10 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+
+    using var scope = app.Services.CreateScope();
+    var contex = scope.ServiceProvider.GetRequiredService<MeetingRoomContext>();
+    DbSeeder.SeedDb(contex);
 }
 
 app.UseHttpsRedirection();
