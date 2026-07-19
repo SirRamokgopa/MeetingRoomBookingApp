@@ -2,40 +2,76 @@
 
 Please read [instructions.md](instructions.md) carefully before you begin.
 
-## Getting Started
+This project is a applications that allows users to manage meeting room bookings within a small office environment.
+It consists of a Vue front end client, a .NET API, and uses SQLite for persistance.
 
-1. Read through [instructions.md](instructions.md) in full before writing any code.
-2. Follow all requirements and constraints outlined in the instructions.
+## How to Run the app
 
-## Your README
-Preliminary project structure
+### Backend
+
+1. Open a terminal in `MeetingRoom.API`
+2. Run:
+
+```bash
+cd MeetingRoom.API
+dotnet restore
+dotnet run
+```
+
+3. The API starts on HTTPS, typically at `https://localhost:7006`. This can be changed in the Luanchsettings.json file.
+
+### Frontend
+
+1. Open a terminal in `meeting-room-client`
+2. Run:
+
+```bash
+cd meeting-room-client
+npm install
+npm run dev
+```
+
+3. The frontend runs on `http://localhost:5173` by default.
+
+### Use the app
+
+- Open the Vite URL shown in the terminal.
+- Browse rooms and bookings.
+- Create, edit, and delete bookings.
+
+## Project structure
 
 ```
-MeetingRoomBooking.Api/
-|----Controllers/
-|    |----BookingsController
-|    |----RoomsController
-|----DTOs/
-|----Services/
-|    |----BookingService
-|----Persistance/
-|    |----Models/
-|    |----MeetingRoomDbContext
-|    |----BookingRepository
-|----Validators/
-|----Data/
-|----|----Sqlite
-|----|----SeedData
-|----|----Migrations
-
-Tests/
-|----BookinServiceTests
-
+MeetingRoom.API/
+|-- Controllers/
+|   |-- BookingsController.cs
+|   |-- RoomsController.cs
+|-- DTOs/
+|-- Persistance/
+|-- Services/
+|-- Properties/
+|-- appsettings.json
 
 meeting-room-client/
-|----Components/
-|----Services/
-|----Types/
+|-- src/
+|   |-- api/
+|   |-- components/
+|   |-- validators/
+|   |-- views/
+|-- package.json
+|-- vite.config.js
+```
+
+## Booking Service
+The booking service is where the main logic for the application lies. 
+
+Responsible for:
+```
+CreateBooking()
+UpdateBooking()
+DeleteBooking()
+GetBookings()
+ValidateBooking()
 ```
 
 ## Entities
@@ -58,28 +94,21 @@ Booking
 ```
 
 ## API
+The api definitions can be viewed with the Swagger-UI by running the API project going to `https://localhost:7006/swagger/index.html`,
+
+Also included in this project is the [Bruno API Client](https://www.usebruno.com/) files that define a collection which devs can use to interact with with API.
 
 ### Rooms
-`GET /rooms`
+`GET /Rooms`
 
 ### Bookings
-`GET /bookings`
+`GET /Bookings`
 
-`GET /bookings/{id}`
+`GET /Bookings/{id}`
 
-`POST /bookings`
+`POST /Bookings`
 
-`PUT /bookings/{ID}`
+`PUT /Bookings/{id}`
 
-`DELETE /bookings/{ID}`
+`DELETE /Bookings/{id}`
 
-
-## Booking Service
-Responsible for:
-```
-CreateBooking()
-UpdateBooking()
-DeleteBooking()
-GetBookings()
-ValidateBooking()
-```
