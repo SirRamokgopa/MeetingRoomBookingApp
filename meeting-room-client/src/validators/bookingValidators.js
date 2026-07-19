@@ -14,6 +14,13 @@ export function validateTimes(startIso, endIso) {
   return null
 }
 
+export function validateRoom(roomId, rooms) {
+  if (roomId == null || roomId === '' || Number.isNaN(Number(roomId))) return 'Room selection is required.'
+  const roomExists = rooms.some((room) => room.id === Number(roomId))
+  if (!roomExists) return 'Selected room does not exist.'
+  return null
+}
+
 // bookings: array of existing bookings { id, roomId, startTime, endTime }
 export function isRoomAvailable(bookingId, roomId, startIso, endIso, bookings) {
   const start = new Date(startIso)
@@ -28,10 +35,12 @@ export function isRoomAvailable(bookingId, roomId, startIso, endIso, bookings) {
   return true
 }
 
-export function validateAll(bookingId, title, roomId, startIso, endIso, bookings) {
+export function validateAll(bookingId, title, roomId, startIso, endIso, bookings, rooms = []) {
   const errors = []
   const t = validateTitle(title)
   if (t) errors.push(t)
+  const roomErr = validateRoom(roomId, rooms)
+  if (roomErr) errors.push(roomErr)
   const timeErr = validateTimes(startIso, endIso)
   if (timeErr) errors.push(timeErr)
   if (!isRoomAvailable(bookingId, roomId, startIso, endIso, bookings)) errors.push('Room is already booked for the selected time range.')

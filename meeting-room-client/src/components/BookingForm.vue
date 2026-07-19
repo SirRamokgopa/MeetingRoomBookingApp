@@ -56,7 +56,15 @@ const submitForm = () => {
   errors.value = []
   const startIso = fromLocalInput(form.startTime)
   const endIso = fromLocalInput(form.endTime)
-  const validationErrors = validateAll(props.bookingId, form.title, Number(form.roomId), startIso, endIso, props.allBookings)
+  const validationErrors = validateAll(
+    props.bookingId,
+    form.title,
+    Number(form.roomId),
+    startIso,
+    endIso,
+    props.allBookings,
+    props.rooms
+  )
   if (validationErrors.length) {
     errors.value = validationErrors
     return
@@ -88,6 +96,7 @@ const submitForm = () => {
       <div>
         <label>Room</label>
         <select v-model="form.roomId">
+          <option :value="null">Select room</option>
           <option v-for="r in rooms" :key="r.id" :value="r.id">
             {{ r.name || `Room ${r.id}` }}
           </option>
