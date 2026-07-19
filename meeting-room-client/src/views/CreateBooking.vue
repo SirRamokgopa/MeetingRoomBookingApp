@@ -6,7 +6,8 @@ import { createBooking, getBookings, getRooms } from '../api/meetingRoomClient'
 
 const route = useRoute()
 const router = useRouter()
-const roomId = Number(route.params.id)
+const roomIdParam = route.params.id
+const roomId = roomIdParam != null && roomIdParam !== '' ? Number(roomIdParam) : null
 
 const rooms = ref([])
 const allBookings = ref([])
@@ -15,7 +16,7 @@ const errors = ref([])
 
 const initialForm = ref({
   title: '',
-  roomId: roomId || null,
+  roomId: Number.isFinite(roomId) ? roomId : null,
   startTime: '',
   endTime: ''
 })
@@ -27,9 +28,6 @@ const load = async () => {
   try {
     rooms.value = await getRooms()
     allBookings.value = await getBookings()
-    if (!initialForm.value.roomId && rooms.value.length) {
-      initialForm.value.roomId = rooms.value[0].id
-    }
   } catch (e) {
     errors.value = [e?.message || 'Failed to load create booking data']
   } finally {
