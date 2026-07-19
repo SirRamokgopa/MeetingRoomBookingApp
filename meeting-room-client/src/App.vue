@@ -1,7 +1,7 @@
 <template>
   <div>
     <header>
-      <h1>Meeting Room Client</h1>
+      <h1>Meeting Room Bookings</h1>
       <nav>
         <router-link to="/">Home</router-link>
       </nav>

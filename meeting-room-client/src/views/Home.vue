@@ -17,7 +17,7 @@ const loadData = async () => {
 
   try {
     const [bookingResults, roomResults] = await Promise.all([getBookings(), getRooms()])
-    bookings.value = bookingResults
+    bookings.value = bookingResults.slice().sort((a, b) => new Date(a.startTime) - new Date(b.startTime))
     rooms.value = roomResults
   } catch (err) {
     error.value = err?.message || 'Unable to load data from the MeetingRoom API.'
@@ -62,7 +62,7 @@ const confirmDelete = async () => {
 
 const deleteDescription = computed(() => {
   return bookingToDelete.value
-    ? `Are you sure you want to delete booking "${bookingToDelete.value.title}"?`
+    ? `I hope you know what you're doing, bro. "${bookingToDelete.value.title}" looked like a solid idea.`
     : ''
 })
 </script>

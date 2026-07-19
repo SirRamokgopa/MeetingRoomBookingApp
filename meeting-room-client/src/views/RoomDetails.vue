@@ -21,7 +21,10 @@ const loadData = async () => {
 
   try {
     const [bookingResults, roomResults] = await Promise.all([getBookings(), getRooms()])
-    bookings.value = bookingResults.filter(b => b.roomId === roomId)
+    bookings.value = bookingResults
+      .filter(b => b.roomId === roomId)
+      .slice()
+      .sort((a, b) => new Date(a.startTime) - new Date(b.startTime))
     room.value = roomResults.find(r => r.id === roomId) || { id: roomId, name: `Room ${roomId}` }
   } catch (err) {
     error.value = err?.message || 'Unable to load data from the MeetingRoom API.'
@@ -58,7 +61,7 @@ const confirmDelete = async () => {
 
 const deleteDescription = computed(() => {
   return bookingToDelete.value
-    ? `Are you sure you want to delete booking "${bookingToDelete.value.title}"?`
+    ? `You can't waste peoples' time if you delete booking "${bookingToDelete.value.title}"?`
     : ''
 })
 </script>
