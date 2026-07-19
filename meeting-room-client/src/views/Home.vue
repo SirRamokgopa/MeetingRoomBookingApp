@@ -71,6 +71,7 @@ const editBooking = (booking) => {
           </tr>
         </tbody>
       </table>
+      <button @click="router.push({ name: 'create-booking' })">Create Booking</button>
     </section>
   </section>
 </template>

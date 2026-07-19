@@ -1,10 +1,12 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { getBookings, getRooms } from '../api/meetingRoomClient'
 
 const route = useRoute()
 const roomId = Number(route.params.id)
+
+const router = useRouter()
 
 const bookings = ref([])
 const room = ref(null)
@@ -36,13 +38,17 @@ onMounted(loadData)
 
     <section v-if="!loading && !error">
       <h2>{{ room.name || `Room ${room.id}` }}</h2>
-
+      <h3>Capacity: {{ room.capacity }}</h3>
       <h3>Bookings for this room</h3>
       <ul>
         <li v-for="b in bookings" :key="b.id">
-          <strong>{{ b.title }}</strong> — {{ new Date(b.startTime).toLocaleString() }} to {{ new Date(b.endTime).toLocaleString() }}
+          <div>
+            <button @click="router.push({ name: 'edit-booking', params: { id: b.id } })">Edit booking</button>
+            <strong>{{ b.title }}</strong> — {{ new Date(b.startTime).toLocaleString() }} to {{ new Date(b.endTime).toLocaleString() }}
+          </div>
         </li>
       </ul>
+      <button @click="router.push({ name: 'create-booking', params: { id: room.id } })">Create Booking</button>
     </section>
   </section>
 </template>
