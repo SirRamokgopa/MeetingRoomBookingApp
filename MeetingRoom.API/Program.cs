@@ -12,6 +12,17 @@ builder.Services.AddDbContext<MeetingRoomContext>(options =>
 builder.Services.AddTransient<IBookingService, BookingService>();
 
 builder.Services.AddControllers();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DevCors", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173", "https://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo { Title = "MeetingRoom.API", Version = "v1" });
@@ -34,6 +45,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("DevCors");
 
 app.UseAuthorization();
 
