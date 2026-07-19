@@ -1,12 +1,14 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { getBookings, getRooms } from '../api/meetingRoomClient'
+import { ref, onMounted, computed } from 'vue'
+import { getBookings, getRooms, deleteBooking } from '../api/meetingRoomClient'
 import { useRouter } from 'vue-router'
+import DeleteConfirmModal from '../components/DeleteConfirmModal.vue'
 
 const bookings = ref([])
 const rooms = ref([])
 const error = ref('')
 const loading = ref(true)
+const bookingToDelete = ref(null)
 const router = useRouter()
 
 const loadData = async () => {
@@ -33,6 +35,36 @@ const openRoom = (room) => {
 const editBooking = (booking) => {
   router.push({ name: 'edit-booking', params: { id: booking.id } })
 }
+
+const showDeleteModal = (booking) => {
+  bookingToDelete.value = booking
+}
+
+const closeDeleteModal = () => {
+  bookingToDelete.value = null
+}
+
+const confirmDelete = async () => {
+  if (!bookingToDelete.value) return
+
+  loading.value = true
+  error.value = ''
+
+  try {
+    await deleteBooking(bookingToDelete.value.id)
+    bookingToDelete.value = null
+    await loadData()
+  } catch (err) {
+    error.value = err?.message || 'Unable to delete booking.'
+    loading.value = false
+  }
+}
+
+const deleteDescription = computed(() => {
+  return bookingToDelete.value
+    ? `Are you sure you want to delete booking "${bookingToDelete.value.title}"?`
+    : ''
+})
 </script>
 
 <template>
@@ -52,26 +84,38 @@ const editBooking = (booking) => {
       <table>
         <thead>
           <tr>
-            <th>""</th>
             <th>ID</th>
             <th>Title</th>
             <th>Room</th>
             <th>Start</th>
             <th>End</th>
+            <th>""</th>
+            <th>""</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="booking in bookings" :key="booking.id">
-            <td><button @click="editBooking(booking)">Edit booking</button></td>
             <td>{{ booking.id }}</td>
             <td>{{ booking.title }}</td>
             <td>{{ booking.roomId }}</td>
             <td>{{ new Date(booking.startTime).toLocaleString() }}</td>
             <td>{{ new Date(booking.endTime).toLocaleString() }}</td>
+            <td><button @click="editBooking(booking)">Edit booking</button></td>
+            <td><button @click="showDeleteModal(booking)">Delete</button></td>
           </tr>
         </tbody>
       </table>
       <button @click="router.push({ name: 'create-booking' })">Create Booking</button>
+
+      <DeleteConfirmModal
+        :show="Boolean(bookingToDelete)"
+        title="Confirm delete"
+        :description="deleteDescription"
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        @confirm="confirmDelete"
+        @cancel="closeDeleteModal"
+      />
     </section>
   </section>
 </template>
