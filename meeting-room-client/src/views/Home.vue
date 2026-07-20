@@ -26,6 +26,13 @@ const loadData = async () => {
   }
 }
 
+const roomMap = computed(() => {
+  return rooms.value.reduce((map, room) => {
+    map[room.id] = room.name || `Room ${room.id}`
+    return map
+  }, {})
+})
+
 onMounted(loadData)
 
 const openRoom = (room) => {
@@ -76,7 +83,7 @@ const deleteDescription = computed(() => {
       <h2>Rooms</h2>
       <ul>
         <li v-for="room in rooms" :key="room.id">
-          <button @click="openRoom(room)">{{ room.name || `Room ${room.id}` }}</button>
+          <button class="room-button" @click="openRoom(room)">{{ room.name || `Room ${room.id}` }}<span class="capacity-label">{{ ` Capacity: ${room.capacity}` || `` }}</span></button>
         </li>
       </ul>
 
@@ -84,24 +91,22 @@ const deleteDescription = computed(() => {
       <table>
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Title</th>
-            <th>Room</th>
-            <th>Start</th>
-            <th>End</th>
-            <th>""</th>
-            <th>""</th>
+            <th class="booking-heading">Title</th>
+            <th class="booking-heading">Room</th>
+            <th class="booking-heading">Start Time</th>
+            <th class="booking-heading">End Time</th>
+            <th></th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="booking in bookings" :key="booking.id">
-            <td>{{ booking.id }}</td>
             <td>{{ booking.title }}</td>
-            <td>{{ booking.roomId }}</td>
+            <td>{{ roomMap[booking.roomId] || booking.roomId }}</td>
             <td>{{ new Date(booking.startTime).toLocaleString() }}</td>
             <td>{{ new Date(booking.endTime).toLocaleString() }}</td>
-            <td><button @click="editBooking(booking)">Edit booking</button></td>
-            <td><button @click="showDeleteModal(booking)">Delete</button></td>
+            <td><button class="edit-button" @click="editBooking(booking)">Edit booking</button></td>
+            <td><button class="delete-button" @click="showDeleteModal(booking)">Delete</button></td>
           </tr>
         </tbody>
       </table>
@@ -122,6 +127,46 @@ const deleteDescription = computed(() => {
 
 <style scoped>
 .error { color: #c92a2a; }
-button { background: none; border: none; color: #0066cc; cursor: pointer; }
-button:hover { text-decoration: underline; }
+
+.room-button {
+  font-size: 1.5rem;
+  border: none;
+
+}
+.room-button:hover {
+  background: rgba(77, 98, 119, 0.08);
+}
+.capacity-label {
+  color: var(--color-text);
+  font-size: 1rem;
+}
+
+h2 {
+  padding-top: 1rem;
+}
+td {
+  padding: 0 1rem;
+}
+th {
+  padding: 0 1rem;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+}
+table {
+  padding: 1rem 0;
+  border-collapse: collapse;
+  table-layout: auto;
+  width: auto;
+  margin: 0;
+}
+
+td,
+th {
+  white-space: normal;
+}
+
+.booking-heading {
+  text-align: left;
+}
+
 </style>

@@ -124,7 +124,7 @@ const submitForm = () => {
 <style scoped>
 .errors { color: #c92a2a; margin-bottom: 1rem }
 label { display: block; margin-top: 0.5rem }
-input, select { width: 100%; padding: 0.4rem; margin-top: 0.25rem }
+input, select { min-width: 20%; padding: 0.4rem; margin-top: 0.25rem }
 .actions { margin-top: 1rem }
 button { margin-right: 0.5rem }
 </style>
