@@ -1,0 +1,25 @@
+info:
+  name: UpdateBooking
+  type: http
+  seq: 6
+
+http:
+  method: PUT
+  url: "{{MeetingRoomAPI}}/Bookings/1"
+  body:
+    type: json
+    data: |-
+      { 
+          "Id": 1,
+          "Title": "That Ammended Meeting Place",
+          "RoomId": 2,
+          "StartTime": "2026-07-20T11:27:15Z",
+          "EndTime": "2026-07-20T12:27:15Z"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

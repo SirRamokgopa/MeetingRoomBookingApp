@@ -1,0 +1,50 @@
+@import './base.css';
+
+#app {
+  margin: 3rem;
+  padding: 2rem;
+  font-weight: normal;
+}
+
+
+@media (hover: hover) {
+  a:hover {
+    background-color: hsla(160, 100%, 37%, 0.2);
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    display: block;
+  }
+
+  #app {
+    display: block;
+    padding: 0 2rem;
+  }
+}
+
+/* make tables use the full available width and avoid overly narrow cells */
+table {
+  border-collapse: collapse;
+}
+
+td,
+th {
+  white-space: nowrap;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+button { 
+  background: none;
+  border: 1px solid #0066cc;
+  padding: 0.5rem 0.9rem;
+  border-radius: 0.25rem;
+  cursor: pointer; 
+  color: #0066cc; 
+}
+button:hover { text-decoration: underline; }
