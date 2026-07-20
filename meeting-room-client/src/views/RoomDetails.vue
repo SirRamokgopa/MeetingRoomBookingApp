@@ -77,10 +77,15 @@ const deleteDescription = computed(() => {
       <h3>Bookings for this room</h3>
       <ul>
         <li v-for="b in bookings" :key="b.id">
-          <div>
-            <strong>{{ b.title }}</strong> — {{ new Date(b.startTime).toLocaleString() }} to {{ new Date(b.endTime).toLocaleString() }}
-            <button @click="router.push({ name: 'edit-booking', params: { id: b.id } })">Edit booking</button>
-            <button @click="showDeleteModal(b)">Delete</button>
+          <div class="booking-item">
+            <div class="booking-details">
+              <strong>{{ b.title }}</strong>
+            </div>
+            <div> — {{ new Date(b.startTime).toLocaleString() }} to {{ new Date(b.endTime).toLocaleString() }}</div>
+            <div class="booking-actions">
+              <button @click="router.push({ name: 'edit-booking', params: { id: b.id } })">Edit booking</button>
+              <button @click="showDeleteModal(b)">Delete</button>
+            </div>
           </div>
         </li>
       </ul>
@@ -101,4 +106,26 @@ const deleteDescription = computed(() => {
 
 <style scoped>
 .error { color: #c92a2a; }
+
+ul {
+  border-top: 1px solid #ccc;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  width: max-content;
+}
+.booking-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.booking-details {
+  flex: 1;
+}
+
+.booking-actions {
+  display: flex;
+  gap: 0.5rem;
+}
 </style>

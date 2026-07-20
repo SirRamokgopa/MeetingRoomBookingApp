@@ -1,19 +1,11 @@
 @import './base.css';
 
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
+  margin: 3rem;
   padding: 2rem;
   font-weight: normal;
 }
 
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
-}
 
 @media (hover: hover) {
   a:hover {
@@ -23,13 +15,36 @@ a,
 
 @media (min-width: 1024px) {
   body {
-    display: flex;
-    place-items: center;
+    display: block;
   }
 
   #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: block;
     padding: 0 2rem;
   }
 }
+
+/* make tables use the full available width and avoid overly narrow cells */
+table {
+  border-collapse: collapse;
+}
+
+td,
+th {
+  white-space: nowrap;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+button { 
+  background: none;
+  border: 1px solid #0066cc;
+  padding: 0.5rem 0.9rem;
+  border-radius: 0.25rem;
+  cursor: pointer; 
+  color: #0066cc; 
+}
+button:hover { text-decoration: underline; }
