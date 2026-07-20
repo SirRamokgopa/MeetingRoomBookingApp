@@ -249,6 +249,12 @@ namespace MeetingRoom.API.Services
                 throw new ArgumentException("Booking title cannot be empty", nameof(booking));
             }
 
+            if (booking.StartTime == null || booking.StartTime == DateTime.MinValue)
+            {
+                _logger.LogWarning("Booking validation failed becuase the start time was null or DateTime.MinValue");
+                throw new ArgumentException("Booking start time cannot be empty", nameof(booking));
+            }
+
             if (booking.StartTime >= booking.EndTime)
             {
                 _logger.LogWarning("Booking validation failed because the time range was invalid for room {RoomId}", booking.RoomId);

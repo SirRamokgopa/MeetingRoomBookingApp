@@ -123,6 +123,22 @@ namespace MeetingRoom.Tests
             await Assert.ThrowsAsync<ArgumentException>(async () => await _bookingService.ValidateBooking(booking));
         }
 
+        [TestMethod]
+        public async Task ValidateBooking_ThrowsException_WhenBookingStartTimeIsMinValue()
+        {
+            // Arrange
+            var booking = new Booking
+            {
+                Title = "Meeting before time",
+                RoomId = 1,
+                StartTime = DateTime.MinValue,
+                EndTime = DateTime.Now.AddHours(2)
+            };
+
+            // Act & Assert
+            await Assert.ThrowsAsync<ArgumentException>(async () => await _bookingService.ValidateBooking(booking));
+        }
+
         #endregion
 
         #region CreateBooking Tests
@@ -210,6 +226,23 @@ namespace MeetingRoom.Tests
             // Assert - Should not throw
             await _bookingService.CreateBooking(booking2);
         }
+
+        [TestMethod]
+        public async Task CreateBooking_ThrowsException_WhenBookingHasNoStartTime()
+        {
+            // Arrange
+            var booking = new CreateBookingDTO
+            {
+                Title = "Coffee Meeting",
+                RoomId = 1,
+                StartTime = DateTime.MinValue,
+                EndTime = DateTime.Now.AddHours(2)
+            };
+
+            // Act & Assert
+            await Assert.ThrowsAsync<ArgumentException>(async () => await _bookingService.CreateBooking(booking));
+        }
+
         #endregion
 
         #region GetBookings Tests
