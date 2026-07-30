@@ -1,6 +1,6 @@
 ﻿using MeetingRoom.Domain.Entities;
 
-namespace MeetingRoom.API.Persistance
+namespace MeetingRoom.Infrastructure.Persistance
 {
     public static class DbSeeder
     {

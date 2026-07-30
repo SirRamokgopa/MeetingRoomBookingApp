@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MeetingRoom.API.Persistance;
 using MeetingRoom.API.Services;
 using MeetingRoom.API.DTOs;
 using MeetingRoom.Domain.Entities;
+using MeetingRoom.Infrastructure.Persistance;
 
 namespace MeetingRoom.Tests
 {

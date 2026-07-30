@@ -2,5 +2,6 @@
   <Project Path="MeetingRoom.API/MeetingRoom.API.csproj" />
   <Project Path="MeetingRoom.Application/MeetingRoom.Application.csproj" Id="b9e91a95-2f12-4e8f-aaaf-aa985b8f161b" />
   <Project Path="MeetingRoom.Domain/MeetingRoom.Domain.csproj" Id="ec065222-5295-451b-81f2-d926e6cf23a9" />
+  <Project Path="MeetingRoom.Infrastructure/MeetingRoom.Infrastructure.csproj" Id="7ad2a239-7559-44a6-9f53-63c5c85f9eac" />
   <Project Path="MeetingRoom.Tests/MeetingRoom.Tests.csproj" Id="089cdb13-1ec9-4230-9a69-a95f954ac99c" />
 </Solution>

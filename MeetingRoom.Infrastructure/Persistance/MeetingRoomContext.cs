@@ -1,7 +1,7 @@
 using MeetingRoom.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace MeetingRoom.API.Persistance
+namespace MeetingRoom.Infrastructure.Persistance
 {
     public class MeetingRoomContext: DbContext
     {

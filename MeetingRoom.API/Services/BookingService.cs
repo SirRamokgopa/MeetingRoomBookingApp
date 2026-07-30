@@ -1,9 +1,9 @@
 using MeetingRoom.API.DTOs;
-using MeetingRoom.API.Persistance;
 using MeetingRoom.API.Services.Mappers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using MeetingRoom.Domain.Entities;
+using MeetingRoom.Infrastructure.Persistance;
 
 namespace MeetingRoom.API.Services
 {
