@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MeetingRoom.Application.Abstractions.Repositories
 {
-    internal interface IRoomRepository
+    public interface IRoomRepository
     {
         Task<Room?> GetRoomByIdAsync(int roomId);
         Task<List<Room>> GetAllRoomsAsync();

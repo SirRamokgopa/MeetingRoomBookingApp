@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MeetingRoom.Application.Abstractions.Repositories
 {
-    internal interface IBookingRepository
+    public interface IBookingRepository
     {
         Task<Booking?> GetBookingAsync(int id);
         Task<List<Booking>> GetAllBookingAsync();
