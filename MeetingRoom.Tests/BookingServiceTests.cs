@@ -2,6 +2,7 @@
 using MeetingRoom.API.Persistance;
 using MeetingRoom.API.Services;
 using MeetingRoom.API.DTOs;
+using MeetingRoom.Domain.Entities;
 
 namespace MeetingRoom.Tests
 {

@@ -1,3 +1,4 @@
+using MeetingRoom.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace MeetingRoom.API.Persistance

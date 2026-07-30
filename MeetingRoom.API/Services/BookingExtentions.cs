@@ -1,5 +1,5 @@
 ﻿using MeetingRoom.API.DTOs;
-using MeetingRoom.API.Persistance;
+using MeetingRoom.Domain.Entities;
 
 namespace MeetingRoom.API.Services.Mappers
 {

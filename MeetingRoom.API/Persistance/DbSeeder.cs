@@ -1,4 +1,6 @@
-﻿namespace MeetingRoom.API.Persistance
+﻿using MeetingRoom.Domain.Entities;
+
+namespace MeetingRoom.API.Persistance
 {
     public static class DbSeeder
     {
