@@ -1,0 +1,17 @@
+﻿using MeetingRoom.Domain.Entities;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace MeetingRoom.Application.Abstractions.Repositories
+{
+    internal interface IBookingRepository
+    {
+        Task<Booking?> GetBookingAsync(int id);
+        Task<List<Booking>> GetAllBookingAsync();
+        Task AddAsync(Booking newBooking);
+        Task UpdateAsync(Booking booking);
+        Task DeleteAsync(Booking booking);
+        Task<Booking?> GetConflictingBookingAsucn(int roomId, DateTime startTime, DateTime endTime, int? excludeBookingId = null);
+    }
+}
