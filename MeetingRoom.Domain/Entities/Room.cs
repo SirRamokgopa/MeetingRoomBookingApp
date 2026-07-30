@@ -1,4 +1,4 @@
-﻿namespace MeetingRoom.API.Persistance
+﻿namespace MeetingRoom.Domain.Entities
 {
     public class Room
     {
