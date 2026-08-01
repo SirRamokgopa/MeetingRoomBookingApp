@@ -1,9 +1,8 @@
 using MeetingRoom.API.DTOs;
 using MeetingRoom.API.Services.Mappers;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging.Abstractions;
+using MeetingRoom.Application.Abstractions.Repositories;
 using MeetingRoom.Domain.Entities;
-using MeetingRoom.Infrastructure.Persistance;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace MeetingRoom.API.Services
 {
@@ -12,16 +11,19 @@ namespace MeetingRoom.API.Services
     /// </summary>
     public class BookingService : IBookingService
     {
-        private readonly MeetingRoomContext _context;
+        private readonly IBookingRepository _bookingRepository;
+        private readonly IRoomRepository _roomRepository;
         private readonly ILogger<BookingService> _logger;
 
-        public BookingService(MeetingRoomContext context) : this(context, NullLogger<BookingService>.Instance)
+        public BookingService(IBookingRepository bookingRepository, IRoomRepository roomRepository)
+            : this(bookingRepository, roomRepository, NullLogger<BookingService>.Instance)
         {
         }
 
-        public BookingService(MeetingRoomContext context, ILogger<BookingService> logger)
+        public BookingService(IBookingRepository bookingRepository, IRoomRepository roomRepository, ILogger<BookingService> logger)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _bookingRepository = bookingRepository ?? throw new ArgumentNullException(nameof(bookingRepository));
+            _roomRepository = roomRepository ?? throw new ArgumentNullException(nameof(roomRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -42,8 +44,7 @@ namespace MeetingRoom.API.Services
                 var bookingEntity = booking.ToEntity();
                 await ValidateBooking(bookingEntity);
 
-                _context.Add(bookingEntity);
-                await _context.SaveChangesAsync();
+                await _bookingRepository.AddAsync(bookingEntity);
 
                 _logger.LogInformation("Booking {BookingId} created successfully", bookingEntity.Id);
                 return bookingEntity.ToDto();
@@ -56,11 +57,6 @@ namespace MeetingRoom.API.Services
             catch (BookingConflictException)
             {
                 throw;
-            }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError(ex, "Failed to persist booking for room {RoomId}", booking.RoomId);
-                throw new InvalidOperationException("Unable to create the booking due to a persistence issue.", ex);
             }
             catch (Exception ex)
             {
@@ -83,7 +79,7 @@ namespace MeetingRoom.API.Services
 
             try
             {
-                var bookingFromDb = await _context.Bookings.FirstOrDefaultAsync(b => b.Id == booking.Id);
+                var bookingFromDb = await _bookingRepository.GetBookingAsync(booking.Id);
 
                 if (bookingFromDb == null)
                 {
@@ -95,7 +91,7 @@ namespace MeetingRoom.API.Services
 
                 await ValidateBooking(bookingFromDb);
 
-                await _context.SaveChangesAsync();
+                await _bookingRepository.UpdateAsync(bookingFromDb);
                 _logger.LogInformation("Booking {BookingId} updated successfully", bookingFromDb.Id);
                 return bookingFromDb.ToDto();
             }
@@ -107,11 +103,6 @@ namespace MeetingRoom.API.Services
             catch (BookingConflictException)
             {
                 throw;
-            }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError(ex, "Failed to update booking {BookingId}", booking.Id);
-                throw new InvalidOperationException("Unable to update the booking due to a persistence issue.", ex);
             }
             catch (Exception ex)
             {
@@ -134,7 +125,7 @@ namespace MeetingRoom.API.Services
 
             try
             {
-                var booking = await _context.Bookings.FirstOrDefaultAsync(b => b.Id == bookingId);
+                var booking = await _bookingRepository.GetBookingAsync(bookingId);
 
                 if (booking == null)
                 {
@@ -142,14 +133,8 @@ namespace MeetingRoom.API.Services
                     return;
                 }
 
-                _context.Bookings.Remove(booking);
-                await _context.SaveChangesAsync();
+                await _bookingRepository.DeleteAsync(booking);
                 _logger.LogInformation("Booking {BookingId} deleted successfully", bookingId);
-            }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError(ex, "Failed to delete booking {BookingId}", bookingId);
-                throw new InvalidOperationException("Unable to delete the booking due to a persistence issue.", ex);
             }
             catch (Exception ex)
             {
@@ -166,9 +151,10 @@ namespace MeetingRoom.API.Services
             try
             {
                 _logger.LogInformation("Retrieving all bookings");
-                var bookings = await _context.Bookings.Select(b => b.ToDto()).ToListAsync();
-                _logger.LogInformation("Retrieved {BookingCount} bookings", bookings.Count);
-                return bookings;
+                var bookings = await _bookingRepository.GetAllBookingAsync();
+                var bookingDtos = bookings.Select(b => b.ToDto()).ToList();
+                _logger.LogInformation("Retrieved {BookingCount} bookings", bookingDtos.Count);
+                return bookingDtos;
             }
             catch (Exception ex)
             {
@@ -186,7 +172,7 @@ namespace MeetingRoom.API.Services
 
             try
             {
-                var booking = await _context.Bookings.FirstOrDefaultAsync(b => b.Id == bookingId);
+                var booking = await _bookingRepository.GetBookingAsync(bookingId);
                 if (booking == null)
                 {
                     _logger.LogWarning("Booking {BookingId} was not found", bookingId);
@@ -209,14 +195,13 @@ namespace MeetingRoom.API.Services
             try
             {
                 _logger.LogInformation("Retrieving available rooms");
-                return await _context.Rooms
-                    .Select(r => new RoomDTO
-                    {
-                        Id = r.Id,
-                        Name = r.Name,
-                        Capacity = r.Capacity
-                    })
-                    .ToListAsync();
+                var rooms = await _roomRepository.GetAllRoomsAsync();
+                return rooms.Select(r => new RoomDTO
+                {
+                    Id = r.Id,
+                    Name = r.Name,
+                    Capacity = r.Capacity
+                }).ToList();
             }
             catch (Exception ex)
             {
@@ -237,7 +222,7 @@ namespace MeetingRoom.API.Services
 
             _logger.LogInformation("Validating booking details for room {RoomId} from {StartTime} to {EndTime}", booking.RoomId, booking.StartTime, booking.EndTime);
 
-            var room = await _context.Rooms.FirstOrDefaultAsync(r => r.Id == booking.RoomId);
+            var room = await _roomRepository.GetRoomByIdAsync(booking.RoomId);
             if (room == null)
             {
                 _logger.LogWarning("Booking validation failed because room {RoomId} does not exist", booking.RoomId);
@@ -272,11 +257,7 @@ namespace MeetingRoom.API.Services
 
         private async Task<Booking?> GetConflictingBooking(Booking booking)
         {
-            return await _context.Bookings.FirstOrDefaultAsync(b =>
-                b.RoomId == booking.RoomId &&
-                b.Id != booking.Id &&
-                b.StartTime < booking.EndTime &&
-                b.EndTime > booking.StartTime);
+            return await _bookingRepository.GetConflictingBookingAsucn(booking.RoomId, booking.StartTime, booking.EndTime, booking.Id);
         }
     }
 

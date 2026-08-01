@@ -1,4 +1,4 @@
-﻿using MeetingRoom.Domain.Entities;
+﻿using MeetingRoom.Infrastructure.Persistance.Entities;
 
 namespace MeetingRoom.Infrastructure.Persistance
 {
@@ -11,8 +11,8 @@ namespace MeetingRoom.Infrastructure.Persistance
                 return;
             }
             context.Rooms.AddRange(
-                new Room { Name = "Defeated Sanity Room", Capacity = 6 },
-                new Room { Name = "Cannibal Corpse Room", Capacity = 8 }
+                new RoomEntity { Name = "Defeated Sanity Room", Capacity = 6 },
+                new RoomEntity { Name = "Cannibal Corpse Room", Capacity = 8 }
             );
             context.SaveChanges();
         }

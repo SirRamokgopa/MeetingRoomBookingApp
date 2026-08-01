@@ -1,4 +1,5 @@
 using MeetingRoom.API.Services;
+using MeetingRoom.Infrastructure;
 using MeetingRoom.Infrastructure.Persistance;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
@@ -30,9 +31,10 @@ else
     resolvedDataSource = $"{dataSourcePrefix}{databasePath}";
 }
 
-// Add services to the container.
 builder.Services.AddDbContext<MeetingRoomContext>(options =>
     options.UseSqlite(resolvedDataSource));
+
+builder.Services.AddInfrastructureRepositories();
 
 builder.Services.AddTransient<IBookingService, BookingService>();
 
@@ -54,12 +56,10 @@ builder.Services.AddSwaggerGen(options =>
     options.EnableAnnotations();
 });
 
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();

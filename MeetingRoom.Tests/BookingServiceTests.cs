@@ -3,6 +3,8 @@ using MeetingRoom.API.Services;
 using MeetingRoom.API.DTOs;
 using MeetingRoom.Domain.Entities;
 using MeetingRoom.Infrastructure.Persistance;
+using MeetingRoom.Infrastructure.Persistance.Entities;
+using MeetingRoom.Infrastructure.Repositories;
 
 namespace MeetingRoom.Tests
 {
@@ -25,8 +27,10 @@ namespace MeetingRoom.Tests
             // Seed test data
             SeedTestData();
             
-            // Initialize the booking service
-            _bookingService = new BookingService(_context);
+            // Initialize the booking service via the repositories, matching the production DI wiring
+            var bookingRepository = new BookingRepository(_context);
+            var roomRepository = new RoomRepository(_context);
+            _bookingService = new BookingService(bookingRepository, roomRepository);
         }
 
         [TestCleanup]
@@ -37,8 +41,8 @@ namespace MeetingRoom.Tests
 
         private void SeedTestData()
         {
-            var room1 = new Room { Id = 1, Name = "Party Room A", Capacity = 10 };
-            var room2 = new Room { Id = 2, Name = "Sleepy Meeting Room B", Capacity = 6 };
+            var room1 = new RoomEntity { Id = 1, Name = "Party Room A", Capacity = 10 };
+            var room2 = new RoomEntity { Id = 2, Name = "Sleepy Meeting Room B", Capacity = 6 };
             
             _context.Rooms.AddRange(room1, room2);
             _context.SaveChanges();
@@ -173,7 +177,7 @@ namespace MeetingRoom.Tests
             var endTime = DateTime.Now.AddHours(2);
             
             // Create first booking
-            var booking1 = new Booking
+            var booking1 = new BookingEntity
             {
                 Title = "Meeting on meetings efficiency",
                 RoomId = 1,
@@ -204,7 +208,7 @@ namespace MeetingRoom.Tests
             var startTime = DateTime.Now.AddDays(1).Date.AddHours(10);
             var endTime = startTime.AddHours(1);
 
-            var booking1 = new Booking
+            var booking1 = new BookingEntity
             {
                 Title = "Meeting about last meeting",
                 RoomId = 1,
@@ -264,7 +268,7 @@ namespace MeetingRoom.Tests
         public async Task GetBookings_ReturnsAllBookings_WhenBookingsExist()
         {
             // Arrange
-            var booking1 = new Booking
+            var booking1 = new BookingEntity
             {
                 Title = "Why are managers like this Meeting",
                 RoomId = 1,
@@ -272,7 +276,7 @@ namespace MeetingRoom.Tests
                 EndTime = DateTime.Now.AddHours(2)
             };
             
-            var booking2 = new Booking
+            var booking2 = new BookingEntity
             {
                 Title = "Meeting to interrupt devs' flow state",
                 RoomId = 2,
@@ -302,7 +306,7 @@ namespace MeetingRoom.Tests
         public async Task GetBookingById_ReturnsCorrectBooking()
         {
             // Arrange
-            var booking = new Booking
+            var booking = new BookingEntity
             {
                 Title = "Team Synergy Meeting",
                 RoomId = 1,
@@ -341,7 +345,7 @@ namespace MeetingRoom.Tests
         public async Task UpdateBooking_SuccessfullyUpdatesBooking()
         {
             // Arrange
-            var originalBooking = new Booking
+            var originalBooking = new BookingEntity
             {
                 Id = 420, 
                 Title = "Original Meeting",
@@ -385,7 +389,7 @@ namespace MeetingRoom.Tests
         public async Task DeleteBooking_SuccessfullyDeletesBooking()
         {
             // Arrange
-            var booking = new Booking
+            var booking = new BookingEntity
             {
                 Title = "We didn't need this meeting anyways",
                 RoomId = 1,
