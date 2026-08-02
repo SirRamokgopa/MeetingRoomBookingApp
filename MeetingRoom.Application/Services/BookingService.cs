@@ -1,6 +1,7 @@
 using MeetingRoom.Application.Abstractions.Repositories;
 using MeetingRoom.Application.DTOs;
 using MeetingRoom.Application.Services;
+using MeetingRoom.Application.Validation;
 using MeetingRoom.Domain.Entities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -10,22 +11,16 @@ namespace MeetingRoom.Application.Services
     /// <summary>
     /// Provides business operations for booking management.
     /// </summary>
-    public class BookingService : IBookingService
+    public class BookingService(IBookingRepository bookingRepository, IRoomRepository roomRepository, IBookingValidator bookingValidator, ILogger<BookingService> logger) : IBookingService
     {
-        private readonly IBookingRepository _bookingRepository;
-        private readonly IRoomRepository _roomRepository;
-        private readonly ILogger<BookingService> _logger;
+        private readonly IBookingRepository _bookingRepository = bookingRepository ?? throw new ArgumentNullException(nameof(bookingRepository));
+        private readonly IRoomRepository _roomRepository = roomRepository ?? throw new ArgumentNullException(nameof(roomRepository));
+        private readonly IBookingValidator _bookingValidator = bookingValidator ?? throw new ArgumentNullException(nameof(bookingValidator));
+        private readonly ILogger<BookingService> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-        public BookingService(IBookingRepository bookingRepository, IRoomRepository roomRepository)
-            : this(bookingRepository, roomRepository, NullLogger<BookingService>.Instance)
+        public BookingService(IBookingRepository bookingRepository, IRoomRepository roomRepository, IBookingValidator bookingValidator)
+            : this(bookingRepository, roomRepository, bookingValidator, NullLogger<BookingService>.Instance)
         {
-        }
-
-        public BookingService(IBookingRepository bookingRepository, IRoomRepository roomRepository, ILogger<BookingService> logger)
-        {
-            _bookingRepository = bookingRepository ?? throw new ArgumentNullException(nameof(bookingRepository));
-            _roomRepository = roomRepository ?? throw new ArgumentNullException(nameof(roomRepository));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
@@ -43,7 +38,9 @@ namespace MeetingRoom.Application.Services
             try
             {
                 var bookingEntity = booking.ToEntity();
-                await ValidateBooking(bookingEntity);
+
+                var validationResult = await _bookingValidator.ValidateAsync(bookingEntity);
+                EnsureValid(validationResult);
 
                 await _bookingRepository.AddAsync(bookingEntity);
 
@@ -90,7 +87,8 @@ namespace MeetingRoom.Application.Services
 
                 bookingFromDb.UpdateFromDto(booking);
 
-                await ValidateBooking(bookingFromDb);
+                var validationResult = await _bookingValidator.ValidateAsync(bookingFromDb);
+                EnsureValid(validationResult);
 
                 await _bookingRepository.UpdateAsync(bookingFromDb);
                 _logger.LogInformation("Booking {BookingId} updated successfully", bookingFromDb.Id);
@@ -212,53 +210,22 @@ namespace MeetingRoom.Application.Services
         }
 
         /// <summary>
-        /// Validates a booking request against room existence, title requirements, time range, and conflicts.
+        /// Translates a <see cref="BookingValidationResult"/> into the service's existing exception contract,
+        /// so callers (e.g. controllers) can keep distinguishing validation failures (400) from conflicts (409).
         /// </summary>
-        public async Task ValidateBooking(Booking booking)
+        private static void EnsureValid(BookingValidationResult validationResult)
         {
-            if (booking == null)
+            if (validationResult.IsValid)
             {
-                throw new ArgumentNullException(nameof(booking));
+                return;
             }
 
-            _logger.LogInformation("Validating booking details for room {RoomId} from {StartTime} to {EndTime}", booking.RoomId, booking.StartTime, booking.EndTime);
-
-            var room = await _roomRepository.GetRoomByIdAsync(booking.RoomId);
-            if (room == null)
+            if (validationResult.ConflictingBooking is not null)
             {
-                _logger.LogWarning("Booking validation failed because room {RoomId} does not exist", booking.RoomId);
-                throw new ArgumentException($"Room with id {booking.RoomId} does not exist", nameof(booking));
+                throw new BookingConflictException(validationResult.ConflictingBooking);
             }
 
-            if (string.IsNullOrWhiteSpace(booking.Title))
-            {
-                _logger.LogWarning("Booking validation failed because the title was empty for room {RoomId}", booking.RoomId);
-                throw new ArgumentException("Booking title cannot be empty", nameof(booking));
-            }
-
-            if (booking.StartTime == null || booking.StartTime == DateTime.MinValue)
-            {
-                _logger.LogWarning("Booking validation failed becuase the start time was null or DateTime.MinValue");
-                throw new ArgumentException("Booking start time cannot be empty", nameof(booking));
-            }
-
-            if (booking.StartTime >= booking.EndTime)
-            {
-                _logger.LogWarning("Booking validation failed because the time range was invalid for room {RoomId}", booking.RoomId);
-                throw new ArgumentException("Booking start time must be before end time", nameof(booking));
-            }
-
-            var conflictingBooking = await GetConflictingBooking(booking);
-            if (conflictingBooking is not null)
-            {
-                _logger.LogWarning("Booking validation found a conflict for room {RoomId} with booking {ConflictingBookingId}", booking.RoomId, conflictingBooking.Id);
-                throw new BookingConflictException(conflictingBooking);
-            }
-        }
-
-        private async Task<Booking?> GetConflictingBooking(Booking booking)
-        {
-            return await _bookingRepository.GetConflictingBookingAsync(booking.RoomId, booking.StartTime, booking.EndTime, booking.Id);
+            throw new ArgumentException(string.Join(" ", validationResult.Errors));
         }
     }
 

@@ -10,10 +10,10 @@ http:
     type: json
     data: |-
       {
-          "Title": "That Meeting Place",
-          "RoomId": 1,
-          "StartTime": "2026-07-20T11:27:15Z",
-          "EndTime": "2026-07-20T12:27:15Z"
+          "Title": "Hanging with The Homies",
+          "RoomId": 2,
+          "StartTime": "2026-08-03T11:27:15Z",
+          "EndTime": "2026-08-03T12:27:15Z"
       }
   auth: inherit
 

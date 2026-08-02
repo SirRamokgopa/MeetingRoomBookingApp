@@ -1,5 +1,4 @@
 ﻿using MeetingRoom.Application.DTOs;
-using MeetingRoom.Domain.Entities;
 
 namespace MeetingRoom.Application.Services
 {
@@ -10,7 +9,6 @@ namespace MeetingRoom.Application.Services
         Task DeleteBookingAsync(int bookingId);
         Task<IEnumerable<BookingDTO>> GetBookings();
         Task<BookingDTO?> GetBookingById(int bookingId);
-        Task ValidateBooking(Booking booking);
         Task<IEnumerable<RoomDTO>> GetRooms();
     }
 }
