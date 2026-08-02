@@ -8,10 +8,10 @@ namespace MeetingRoom.Application.Abstractions.Repositories
     public interface IBookingRepository
     {
         Task<Booking?> GetBookingAsync(int id);
-        Task<List<Booking>> GetAllBookingAsync();
+        Task<IEnumerable<Booking>> GetAllBookingAsync();
         Task AddAsync(Booking newBooking);
         Task UpdateAsync(Booking booking);
         Task DeleteAsync(Booking booking);
-        Task<Booking?> GetConflictingBookingAsucn(int roomId, DateTime startTime, DateTime endTime, int? excludeBookingId = null);
+        Task<Booking?> GetConflictingBookingAsync(int roomId, DateTime startTime, DateTime endTime, int? excludeBookingId = null);
     }
 }
