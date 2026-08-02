@@ -17,13 +17,13 @@ namespace MeetingRoom.Infrastructure.Repositories
         {
         }
 
-        public async Task<List<Room>> GetAllRoomsAsync()
+        public async Task<IEnumerable<Room>> GetAllRoomsAsync()
         {
             try
             {
                 _logger.LogInformation("Retrieving available rooms");
                 var entities = await _context.Rooms.ToListAsync();
-                return entities.Select(e => e.ToDomain()).ToList();
+                return entities.Select(e => e.ToDomain());
             }
             catch (Exception ex)
             {
@@ -34,8 +34,23 @@ namespace MeetingRoom.Infrastructure.Repositories
 
         public async Task<Room?> GetRoomByIdAsync(int roomId)
         {
-            var entity = await _context.Rooms.FirstOrDefaultAsync(r => r.Id == roomId);
-            return entity?.ToDomain();
+            _logger.LogInformation("Retrieving room {RoomId}", roomId);
+
+            try
+            {
+                var entity = await _context.Rooms.FirstOrDefaultAsync(r => r.Id == roomId);
+                if (entity == null)
+                {
+                    _logger.LogWarning("Room {RoomId} was not found", roomId);
+                }
+
+                return entity?.ToDomain();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to retrieve room {RoomId}", roomId);
+                throw new InvalidOperationException("Unable to retrieve the room.", ex);
+            }
         }
     }
 }

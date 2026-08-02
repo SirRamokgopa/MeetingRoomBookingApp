@@ -257,7 +257,7 @@ namespace MeetingRoom.API.Services
 
         private async Task<Booking?> GetConflictingBooking(Booking booking)
         {
-            return await _bookingRepository.GetConflictingBookingAsucn(booking.RoomId, booking.StartTime, booking.EndTime, booking.Id);
+            return await _bookingRepository.GetConflictingBookingAsync(booking.RoomId, booking.StartTime, booking.EndTime, booking.Id);
         }
     }
 
