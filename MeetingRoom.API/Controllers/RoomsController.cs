@@ -1,5 +1,5 @@
-﻿using MeetingRoom.API.DTOs;
-using MeetingRoom.API.Services;
+﻿using MeetingRoom.Application.DTOs;
+using MeetingRoom.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MeetingRoom.API.Controllers

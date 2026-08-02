@@ -1,13 +1,40 @@
-using MeetingRoom.API.Persistance;
-using MeetingRoom.API.Services;
+using MeetingRoom.Application.Services;
+using MeetingRoom.Infrastructure;
+using MeetingRoom.Infrastructure.Persistance;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+var configuredConnectionString = builder.Configuration.GetConnectionString("MeetingRoomDb");
+var resolvedDataSource = configuredConnectionString;
+const string dataSourcePrefix = "Data Source=";
+
+if (!string.IsNullOrWhiteSpace(configuredConnectionString))
+{
+    if (configuredConnectionString.StartsWith(dataSourcePrefix, StringComparison.OrdinalIgnoreCase))
+    {
+        var configuredDataSource = configuredConnectionString[dataSourcePrefix.Length..];
+
+        if (!Path.IsPathRooted(configuredDataSource))
+        {
+            configuredDataSource = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, configuredDataSource));
+        }
+
+        resolvedDataSource = $"{dataSourcePrefix}{configuredDataSource}";
+    }
+}
+else
+{
+    var databasePath = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, "..", "MeetingRoom.Infrastructure", "Persistance", "Data", "meetingroom.db"));
+    Directory.CreateDirectory(Path.GetDirectoryName(databasePath)!);
+    resolvedDataSource = $"{dataSourcePrefix}{databasePath}";
+}
+
 builder.Services.AddDbContext<MeetingRoomContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("MeetingRoomDb")));
+    options.UseSqlite(resolvedDataSource));
+
+builder.Services.AddInfrastructureRepositories();
 
 builder.Services.AddTransient<IBookingService, BookingService>();
 
@@ -29,12 +56,10 @@ builder.Services.AddSwaggerGen(options =>
     options.EnableAnnotations();
 });
 
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
