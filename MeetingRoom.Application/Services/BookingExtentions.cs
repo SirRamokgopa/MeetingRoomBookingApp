@@ -1,7 +1,7 @@
-﻿using MeetingRoom.API.DTOs;
+﻿using MeetingRoom.Application.DTOs;
 using MeetingRoom.Domain.Entities;
 
-namespace MeetingRoom.API.Services.Mappers
+namespace MeetingRoom.Application.Services
 {
     public static class BookingExtentions
     {

@@ -1,4 +1,4 @@
-using MeetingRoom.API.Services;
+using MeetingRoom.Application.Services;
 using MeetingRoom.Infrastructure;
 using MeetingRoom.Infrastructure.Persistance;
 using Microsoft.EntityFrameworkCore;

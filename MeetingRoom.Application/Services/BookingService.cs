@@ -1,10 +1,11 @@
-using MeetingRoom.API.DTOs;
-using MeetingRoom.API.Services.Mappers;
 using MeetingRoom.Application.Abstractions.Repositories;
+using MeetingRoom.Application.DTOs;
+using MeetingRoom.Application.Services;
 using MeetingRoom.Domain.Entities;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace MeetingRoom.API.Services
+namespace MeetingRoom.Application.Services
 {
     /// <summary>
     /// Provides business operations for booking management.

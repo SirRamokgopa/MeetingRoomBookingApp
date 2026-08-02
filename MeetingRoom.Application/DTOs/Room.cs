@@ -1,4 +1,4 @@
-﻿namespace MeetingRoom.API.DTOs
+namespace MeetingRoom.Application.DTOs
 {
     public class RoomDTO
     {

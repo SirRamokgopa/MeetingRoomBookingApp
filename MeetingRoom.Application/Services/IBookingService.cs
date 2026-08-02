@@ -1,7 +1,7 @@
-﻿using MeetingRoom.API.DTOs;
+﻿using MeetingRoom.Application.DTOs;
 using MeetingRoom.Domain.Entities;
 
-namespace MeetingRoom.API.Services
+namespace MeetingRoom.Application.Services
 {
     public interface IBookingService
     {
