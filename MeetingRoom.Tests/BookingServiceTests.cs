@@ -5,6 +5,7 @@ using MeetingRoom.Infrastructure.Persistance;
 using MeetingRoom.Infrastructure.Persistance.Entities;
 using MeetingRoom.Infrastructure.Repositories;
 using MeetingRoom.Application.Services;
+using MeetingRoom.Application.Validation;
 
 namespace MeetingRoom.Tests
 {
@@ -30,7 +31,8 @@ namespace MeetingRoom.Tests
             // Initialize the booking service via the repositories, matching the production DI wiring
             var bookingRepository = new BookingRepository(_context);
             var roomRepository = new RoomRepository(_context);
-            _bookingService = new BookingService(bookingRepository, roomRepository);
+            var bookingValidator = new BookingValidator(bookingRepository, roomRepository);
+            _bookingService = new BookingService(bookingRepository, roomRepository, bookingValidator);
         }
 
         [TestCleanup]
@@ -73,75 +75,6 @@ namespace MeetingRoom.Tests
             Assert.AreEqual(10, rooms[0].Capacity);
             Assert.AreEqual("Sleepy Meeting Room B", rooms[1].Name);
             Assert.AreEqual(6, rooms[1].Capacity);
-        }
-
-        #endregion
-
-        #region ValidateBooking Tests
-        //===================================================================================================================
-
-        [TestMethod]
-        public async Task ValidateBooking_ThrowsException_WhenRoomDoesNotExist()
-        {
-            // Arrange
-            var booking = new Booking
-            {
-                Title = "What? Another Team Meeting?",
-                RoomId = 69, // Where the hell is this??
-                StartTime = DateTime.Now.AddHours(1),
-                EndTime = DateTime.Now.AddHours(2)
-            };
-
-            // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(async () => await _bookingService.ValidateBooking(booking));
-        }
-
-        [TestMethod]
-        public async Task ValidateBooking_ThrowsException_WhenStartTimeAfterEndTime()
-        {
-            // Arrange
-            var booking = new Booking
-            {
-                Title = "Should have been an email Meeting",
-                RoomId = 1,
-                StartTime = DateTime.Now.AddHours(2),
-                EndTime = DateTime.Now.AddHours(1) // End time before start time
-            };
-
-            // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(async () => await _bookingService.ValidateBooking(booking));
-        }
-
-        [TestMethod]
-        public async Task ValidateBooking_ThrowsException_WhenBookingTitleIsEmpty()
-        {
-            // Arrange
-            var booking = new Booking
-            {
-                Title = string.Empty,
-                RoomId = 1,
-                StartTime = DateTime.Now.AddHours(1),
-                EndTime = DateTime.Now.AddHours(2)
-            };
-
-            // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(async () => await _bookingService.ValidateBooking(booking));
-        }
-
-        [TestMethod]
-        public async Task ValidateBooking_ThrowsException_WhenBookingStartTimeIsMinValue()
-        {
-            // Arrange
-            var booking = new Booking
-            {
-                Title = "Meeting before time",
-                RoomId = 1,
-                StartTime = DateTime.MinValue,
-                EndTime = DateTime.Now.AddHours(2)
-            };
-
-            // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(async () => await _bookingService.ValidateBooking(booking));
         }
 
         #endregion
