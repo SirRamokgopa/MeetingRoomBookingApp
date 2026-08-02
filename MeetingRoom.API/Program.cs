@@ -1,4 +1,5 @@
 using MeetingRoom.Application.Services;
+using MeetingRoom.Application.Validation;
 using MeetingRoom.Infrastructure;
 using MeetingRoom.Infrastructure.Persistance;
 using Microsoft.EntityFrameworkCore;
@@ -36,6 +37,7 @@ builder.Services.AddDbContext<MeetingRoomContext>(options =>
 
 builder.Services.AddInfrastructureRepositories();
 
+builder.Services.AddScoped<IBookingValidator, BookingValidator>();
 builder.Services.AddTransient<IBookingService, BookingService>();
 
 builder.Services.AddControllers();
