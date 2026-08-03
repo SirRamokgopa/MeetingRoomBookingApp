@@ -1,6 +1,6 @@
 <script setup>
 import { reactive, ref, watch } from 'vue'
-import { validateAll } from '../validators/bookingValidators'
+import { bookingSchema } from '../validators/bookingSchema'
 
 const props = defineProps({
   initialForm: { type: Object, required: true },
@@ -52,30 +52,29 @@ function fromLocalInput(value) {
   return `${YYYY}-${MM}-${DD}T${hh}:${mm}:${ss}${sign}${tzh}:${tzm}`
 }
 
-const submitForm = () => {
+const submitForm = async () => {
   errors.value = []
   const startIso = fromLocalInput(form.startTime)
   const endIso = fromLocalInput(form.endTime)
-  const validationErrors = validateAll(
-    props.bookingId,
-    form.title,
-    Number(form.roomId),
-    startIso,
-    endIso,
-    props.allBookings,
-    props.rooms
-  )
-  if (validationErrors.length) {
-    errors.value = validationErrors
+
+  const candidate = {
+    title: form.title,
+    roomId: form.roomId === null || form.roomId === '' ? null : Number(form.roomId),
+    startTime: startIso,
+    endTime: endIso
+  }
+
+  try {
+    await bookingSchema.validate(candidate, {
+      abortEarly: false,
+      context: { rooms: props.rooms, allBookings: props.allBookings, bookingId: props.bookingId }
+    })
+  } catch (validationError) {
+    errors.value = validationError.errors
     return
   }
 
-  emit('submit', {
-    title: form.title,
-    roomId: Number(form.roomId),
-    startTime: startIso,
-    endTime: endIso
-  })
+  emit('submit', candidate)
 }
 </script>
 
