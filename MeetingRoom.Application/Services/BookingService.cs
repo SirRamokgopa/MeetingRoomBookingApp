@@ -45,7 +45,8 @@ namespace MeetingRoom.Application.Services
                 await _bookingRepository.AddAsync(bookingEntity);
 
                 _logger.LogInformation("Booking {BookingId} created successfully", bookingEntity.Id);
-                return bookingEntity.ToDto();
+                var room = await _roomRepository.GetRoomByIdAsync(bookingEntity.RoomId);
+                return bookingEntity.ToDto(room?.Name ?? $"Room {bookingEntity.RoomId}");
             }
             catch (ArgumentException ex)
             {
@@ -92,7 +93,8 @@ namespace MeetingRoom.Application.Services
 
                 await _bookingRepository.UpdateAsync(bookingFromDb);
                 _logger.LogInformation("Booking {BookingId} updated successfully", bookingFromDb.Id);
-                return bookingFromDb.ToDto();
+                var room = await _roomRepository.GetRoomByIdAsync(bookingFromDb.RoomId);
+                return bookingFromDb.ToDto(room?.Name ?? $"Room {bookingFromDb.RoomId}");
             }
             catch (ArgumentException ex)
             {
@@ -151,7 +153,12 @@ namespace MeetingRoom.Application.Services
             {
                 _logger.LogInformation("Retrieving all bookings");
                 var bookings = await _bookingRepository.GetAllBookingAsync();
-                var bookingDtos = bookings.Select(b => b.ToDto()).ToList();
+                var rooms = await _roomRepository.GetAllRoomsAsync();
+                var roomNamesById = rooms.ToDictionary(r => r.Id, r => r.Name);
+
+                var bookingDtos = bookings
+                    .Select(b => b.ToDto(roomNamesById.TryGetValue(b.RoomId, out var roomName) ? roomName : $"Room {b.RoomId}"))
+                    .ToList();
                 _logger.LogInformation("Retrieved {BookingCount} bookings", bookingDtos.Count);
                 return bookingDtos;
             }
@@ -175,9 +182,11 @@ namespace MeetingRoom.Application.Services
                 if (booking == null)
                 {
                     _logger.LogWarning("Booking {BookingId} was not found", bookingId);
+                    return null;
                 }
 
-                return booking?.ToDto();
+                var room = await _roomRepository.GetRoomByIdAsync(booking.RoomId);
+                return booking.ToDto(room?.Name ?? $"Room {booking.RoomId}");
             }
             catch (Exception ex)
             {

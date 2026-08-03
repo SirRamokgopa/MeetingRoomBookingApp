@@ -28,7 +28,7 @@ namespace MeetingRoom.Infrastructure.Persistance
                 entity.Property(b => b.Title).IsRequired();
 
                 entity.HasOne(b => b.Room)
-                    .WithMany(r => r.Bookings)
+                    .WithMany()
                     .HasForeignKey(b => b.RoomId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
