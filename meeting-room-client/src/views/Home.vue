@@ -26,13 +26,6 @@ const loadData = async () => {
   }
 }
 
-const roomMap = computed(() => {
-  return rooms.value.reduce((map, room) => {
-    map[room.id] = room.name || `Room ${room.id}`
-    return map
-  }, {})
-})
-
 onMounted(loadData)
 
 const openRoom = (room) => {
@@ -102,7 +95,7 @@ const deleteDescription = computed(() => {
         <tbody>
           <tr v-for="booking in bookings" :key="booking.id">
             <td>{{ booking.title }}</td>
-            <td>{{ roomMap[booking.roomId] || booking.roomId }}</td>
+            <td>{{ booking.roomName || booking.roomId }}</td>
             <td>{{ new Date(booking.startTime).toLocaleString() }}</td>
             <td>{{ new Date(booking.endTime).toLocaleString() }}</td>
             <td><button class="edit-button" @click="editBooking(booking)">Edit booking</button></td>
