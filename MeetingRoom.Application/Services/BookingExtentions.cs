@@ -5,13 +5,14 @@ namespace MeetingRoom.Application.Services
 {
     public static class BookingExtentions
     {
-        public static BookingDTO ToDto(this Booking booking)
+        public static BookingDTO ToDto(this Booking booking, string roomName)
         {
             return new BookingDTO
             {
                 Id = booking.Id,
                 Title = booking.Title,
                 RoomId = booking.RoomId,
+                RoomName = roomName,
                 StartTime = booking.StartTime,
                 EndTime = booking.EndTime
             };
@@ -23,16 +24,16 @@ namespace MeetingRoom.Application.Services
             {
                 Title = dto.Title,
                 RoomId = dto.RoomId,
-                StartTime = (DateTime)dto.StartTime,
-                EndTime = (DateTime)dto.EndTime
+                StartTime = dto.StartTime!.Value,
+                EndTime = dto.EndTime!.Value
             };
         }
         public static void UpdateFromDto(this Booking booking, UpdateBookingDTO dto)
         {
             booking.Title = dto.Title;
             booking.RoomId = dto.RoomId;
-            booking.StartTime = (DateTime)dto.StartTime;
-            booking.EndTime = (DateTime)dto.EndTime;
+            booking.StartTime = dto.StartTime!.Value;
+            booking.EndTime = dto.EndTime!.Value;
         }
     }
 }
