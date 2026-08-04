@@ -1,53 +1,52 @@
-/* color palette from <https://github.com/vuejs/theme> */
+/* Meeting Room Bookings — design tokens (black + blue theme) */
 :root {
-  --vt-c-white: #ffffff;
-  --vt-c-white-soft: #f8f8f8;
-  --vt-c-white-mute: #f2f2f2;
+  /* Base neutrals (near-black surfaces) */
+  --c-black: #05070c;
+  --c-surface-0: #0a0e16;
+  --c-surface-1: #10151f;
+  --c-surface-2: #161c2a;
+  --c-surface-3: #1e2536;
 
-  --vt-c-black: #181818;
-  --vt-c-black-soft: #222222;
-  --vt-c-black-mute: #282828;
+  /* Blues */
+  --c-blue-100: #dce8ff;
+  --c-blue-300: #7fa8ff;
+  --c-blue-400: #5b8def;
+  --c-blue-500: #3b6fe0;
+  --c-blue-600: #2c5bd1;
+  --c-blue-700: #1f45a8;
+  --c-blue-glow: rgba(59, 111, 224, 0.35);
 
-  --vt-c-indigo: #2c3e50;
+  /* Text */
+  --c-text: #e8ecf6;
+  --c-text-muted: #93a0bd;
+  --c-text-faint: #5d6a88;
 
-  --vt-c-divider-light-1: rgba(60, 60, 60, 0.29);
-  --vt-c-divider-light-2: rgba(60, 60, 60, 0.12);
-  --vt-c-divider-dark-1: rgba(84, 84, 84, 0.65);
-  --vt-c-divider-dark-2: rgba(84, 84, 84, 0.48);
+  /* Status */
+  --c-danger: #f0556c;
+  --c-danger-bg: rgba(240, 85, 108, 0.12);
+  --c-success: #3ecf8e;
 
-  --vt-c-text-light-1: var(--vt-c-indigo);
-  --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
-  --vt-c-text-dark-1: var(--vt-c-white);
-  --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
-}
+  /* Borders */
+  --c-border: rgba(127, 168, 255, 0.14);
+  --c-border-strong: rgba(127, 168, 255, 0.3);
 
-/* semantic color variables for this project */
-:root {
-  --color-background: var(--vt-c-white);
-  --color-background-soft: var(--vt-c-white-soft);
-  --color-background-mute: var(--vt-c-white-mute);
+  /* Semantic aliases used across the app */
+  --color-background: var(--c-black);
+  --color-background-soft: var(--c-surface-0);
+  --color-background-mute: var(--c-surface-1);
+  --color-heading: #ffffff;
+  --color-text: var(--c-text);
 
-  --color-border: var(--vt-c-divider-light-2);
-  --color-border-hover: var(--vt-c-divider-light-1);
+  /* Shape & motion */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --shadow-elevated: 0 20px 45px -20px rgba(0, 0, 0, 0.65);
+  --shadow-glow: 0 0 0 3px var(--c-blue-glow);
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.25s ease;
 
-  --color-heading: var(--vt-c-text-light-1);
-  --color-text: var(--vt-c-text-light-1);
-
-  --section-gap: 160px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-background: var(--vt-c-black);
-    --color-background-soft: var(--vt-c-black-soft);
-    --color-background-mute: var(--vt-c-black-mute);
-
-    --color-border: var(--vt-c-divider-dark-2);
-    --color-border-hover: var(--vt-c-divider-dark-1);
-
-    --color-heading: var(--vt-c-text-dark-1);
-    --color-text: var(--vt-c-text-dark-2);
-  }
+  color-scheme: dark;
 }
 
 *,
@@ -58,13 +57,18 @@
   font-weight: normal;
 }
 
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
 body {
   min-height: 100vh;
   color: var(--color-text);
-  background: var(--color-background);
-  transition:
-    color 0.5s,
-    background-color 0.5s;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(59, 111, 224, 0.16), transparent 45%),
+    radial-gradient(circle at 88% 8%, rgba(91, 141, 239, 0.1), transparent 40%),
+    var(--color-background);
+  background-attachment: fixed;
   line-height: 1.6;
   font-family:
     Inter,
@@ -83,4 +87,52 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  color: var(--color-heading);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+a {
+  color: var(--c-blue-300);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--c-blue-100);
+}
+
+::selection {
+  background: var(--c-blue-600);
+  color: #fff;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--c-surface-0);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--c-surface-3);
+  border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--c-blue-700);
+}
+
+:focus-visible {
+  outline: 2px solid var(--c-blue-400);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
 }
