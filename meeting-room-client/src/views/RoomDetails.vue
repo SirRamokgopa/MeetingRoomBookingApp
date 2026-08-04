@@ -77,7 +77,7 @@ const deleteDescription = computed(() => {
           <h2>{{ room.name || `Room ${room.id}` }}</h2>
           <span class="badge">Capacity {{ room.capacity }}</span>
         </div>
-        <button class="btn btn-primary" @click="router.push({ name: 'create-booking', params: { id: room.id } })">
+        <button class="btn btn-primary" @click="router.push({ name: 'create-booking-room', params: { id: room.id } })">
           + Create booking
         </button>
       </div>

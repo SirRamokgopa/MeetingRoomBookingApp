@@ -3,7 +3,7 @@
     <header class="app-header">
       <div class="app-header-inner">
         <router-link to="/" class="brand">
-          <span class="brand-name">Meeting Room Bookings</span>
+          <span class="brand-name">Meeting Doom Bookings</span>
         </router-link>
         <nav class="app-nav">
           <router-link to="/">Home</router-link>
