@@ -86,13 +86,13 @@ const submitForm = async () => {
       </ul>
     </div>
 
-    <form @submit.prevent="submitForm">
-      <div>
+    <form class="booking-form" @submit.prevent="submitForm">
+      <div class="field field-full">
         <label>Title</label>
-        <input v-model="form.title" />
+        <input v-model="form.title" placeholder="e.g. Sprint planning" />
       </div>
 
-      <div>
+      <div class="field">
         <label>Room</label>
         <select v-model="form.roomId">
           <option :value="null">Select room</option>
@@ -102,28 +102,48 @@ const submitForm = async () => {
         </select>
       </div>
 
-      <div>
+      <div class="field">
         <label>Start</label>
         <input type="datetime-local" v-model="form.startTime" />
       </div>
 
-      <div>
+      <div class="field">
         <label>End</label>
         <input type="datetime-local" v-model="form.endTime" />
       </div>
 
-      <div class="actions">
-        <button type="submit">{{ submitLabel }}</button>
-        <button type="button" @click="$emit('cancel')">Cancel</button>
+      <div class="actions field-full">
+        <button type="submit" class="btn-primary">{{ submitLabel }}</button>
+        <button type="button" class="btn-ghost" @click="$emit('cancel')">Cancel</button>
       </div>
     </form>
   </div>
 </template>
 
 <style scoped>
-.errors { color: #c92a2a; margin-bottom: 1rem }
-label { display: block; margin-top: 0.5rem }
-input, select { min-width: 20%; padding: 0.4rem; margin-top: 0.25rem }
-.actions { margin-top: 1rem }
-button { margin-right: 0.5rem }
+.booking-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 1.25rem;
+}
+
+.field-full {
+  grid-column: 1 / -1;
+}
+
+.field label {
+  margin-top: 0;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 480px) {
+  .booking-form {
+    grid-template-columns: 1fr;
+  }
+}
 </style>

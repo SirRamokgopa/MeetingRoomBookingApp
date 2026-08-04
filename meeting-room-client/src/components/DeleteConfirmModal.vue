@@ -30,40 +30,39 @@ const emit = defineEmits(['confirm', 'cancel'])
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(3, 5, 10, 0.72);
+  backdrop-filter: blur(3px);
   padding: 1rem;
   z-index: 50;
 }
 .modal {
-  background: black;
-  border-radius: 0.5rem;
+  background: linear-gradient(180deg, var(--c-surface-2), var(--c-surface-1));
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
   padding: 1.5rem;
   max-width: 90%;
   width: 400px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-elevated);
+}
+.modal h3 {
+  margin-bottom: 0.5rem;
+}
+.modal p {
+  color: var(--c-text-muted);
 }
 .modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 0.75rem;
-  margin-top: 1rem;
-}
-.modal button {
-  background: none;
-  border: 1px solid #0066cc;
-  color: #0066cc;
-  padding: 0.5rem 0.9rem;
-  border-radius: 0.25rem;
-  cursor: pointer;
-}
-.modal button:hover {
-  background: rgba(0, 102, 204, 0.08);
+  margin-top: 1.5rem;
 }
 .modal button.danger {
-  border-color: #c92a2a;
-  color: #c92a2a;
+  border-color: rgba(240, 85, 108, 0.45);
+  color: var(--c-danger);
 }
 .modal button.danger:hover {
-  background: rgba(201, 42, 42, 0.1);
+  background: var(--c-danger-bg);
+  border-color: var(--c-danger);
+  color: #fff5f6;
 }
 </style>

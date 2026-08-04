@@ -1,50 +1,249 @@
 @import './base.css';
 
+/* ---------- App shell ---------- */
 #app {
-  margin: 3rem;
-  padding: 2rem;
-  font-weight: normal;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
+.page-container {
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 2rem clamp(1rem, 4vw, 2.5rem) 4rem;
 }
 
-@media (min-width: 1024px) {
-  body {
-    display: block;
-  }
-
-  #app {
-    display: block;
-    padding: 0 2rem;
-  }
+.page-header {
+  margin-bottom: 1.75rem;
 }
 
-/* make tables use the full available width and avoid overly narrow cells */
+.page-header h2 {
+  font-size: 1.5rem;
+}
+
+.page-subtitle {
+  color: var(--c-text-muted);
+  margin-top: 0.25rem;
+}
+
+/* ---------- Cards & surfaces ---------- */
+.card {
+  background: linear-gradient(180deg, var(--c-surface-1), var(--c-surface-0));
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-elevated);
+  padding: 1.5rem;
+}
+
+.section-gap {
+  margin-top: 2.5rem;
+}
+
+/* ---------- Buttons ---------- */
+button,
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  background: transparent;
+  border: 1px solid var(--c-border-strong);
+  color: var(--c-blue-300);
+  padding: 0.55rem 1.1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast),
+    color var(--transition-fast), transform var(--transition-fast);
+}
+
+button:hover,
+.btn:hover {
+  border-color: var(--c-blue-400);
+  background: rgba(91, 141, 239, 0.1);
+  color: var(--c-blue-100);
+}
+
+button:active,
+.btn:active {
+  transform: translateY(1px);
+}
+
+button:disabled,
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-primary {
+  background: linear-gradient(180deg, var(--c-blue-500), var(--c-blue-600));
+  border-color: var(--c-blue-500);
+  color: #fff;
+  box-shadow: 0 8px 20px -8px var(--c-blue-glow);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(180deg, var(--c-blue-400), var(--c-blue-500));
+  border-color: var(--c-blue-400);
+  color: #fff;
+}
+
+.btn-danger {
+  border-color: rgba(240, 85, 108, 0.45);
+  color: var(--c-danger);
+}
+
+.btn-danger:hover {
+  background: var(--c-danger-bg);
+  border-color: var(--c-danger);
+  color: #fff5f6;
+}
+
+.btn-ghost {
+  border-color: transparent;
+  color: var(--c-text-muted);
+}
+
+.btn-ghost:hover {
+  border-color: var(--c-border);
+  background: var(--c-surface-2);
+  color: var(--c-text);
+}
+
+.btn-sm {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+/* ---------- Tables ---------- */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-md);
+  background: var(--c-surface-0);
+}
+
 table {
   border-collapse: collapse;
+  width: 100%;
+  min-width: 640px;
 }
 
-td,
-th {
+th,
+td {
+  padding: 0.75rem 1rem;
   white-space: nowrap;
+  text-align: left;
 }
 
+thead th {
+  color: var(--c-text-muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--c-border);
+  background: var(--c-surface-1);
+}
+
+tbody tr {
+  border-bottom: 1px solid var(--c-border);
+  transition: background-color var(--transition-fast);
+}
+
+tbody tr:last-child {
+  border-bottom: none;
+}
+
+tbody tr:hover {
+  background: rgba(91, 141, 239, 0.06);
+}
+
+/* ---------- Lists ---------- */
 ul {
   list-style: none;
   padding: 0;
 }
 
-button { 
-  background: none;
-  border: 1px solid #0066cc;
-  padding: 0.5rem 0.9rem;
-  border-radius: 0.25rem;
-  cursor: pointer; 
-  color: #0066cc; 
+/* ---------- Forms ---------- */
+label {
+  display: block;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: var(--c-text-muted);
+  margin-bottom: 0.35rem;
 }
-button:hover { text-decoration: underline; }
+
+input,
+select,
+textarea {
+  width: 100%;
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-border);
+  color: var(--c-text);
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+input:hover,
+select:hover,
+textarea:hover {
+  border-color: var(--c-border-strong);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--c-blue-400);
+  box-shadow: var(--shadow-glow);
+}
+
+/* ---------- Alerts / status ---------- */
+.error,
+.errors {
+  color: var(--c-danger);
+  background: var(--c-danger-bg);
+  border: 1px solid rgba(240, 85, 108, 0.35);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.errors ul {
+  padding-left: 1.1rem;
+  list-style: disc;
+}
+
+.loading-text {
+  color: var(--c-text-muted);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-border);
+  color: var(--c-text-muted);
+  font-size: 0.78rem;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 640px) {
+  .page-container {
+    padding: 1.25rem 1rem 3rem;
+  }
+
+  .card {
+    padding: 1.1rem;
+    border-radius: var(--radius-md);
+  }
+}
