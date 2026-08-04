@@ -26,13 +26,6 @@ const loadData = async () => {
   }
 }
 
-const roomMap = computed(() => {
-  return rooms.value.reduce((map, room) => {
-    map[room.id] = room.name || `Room ${room.id}`
-    return map
-  }, {})
-})
-
 onMounted(loadData)
 
 const openRoom = (room) => {
@@ -75,42 +68,61 @@ const deleteDescription = computed(() => {
 </script>
 
 <template>
-  <section>
-    <p v-if="loading">Loading bookings and rooms…</p>
+  <section class="page-container">
+    <p v-if="loading" class="loading-text">Loading bookings and rooms…</p>
     <p v-if="error" class="error">{{ error }}</p>
 
     <section v-if="!loading && !error">
-      <h2>Rooms</h2>
-      <ul>
-        <li v-for="room in rooms" :key="room.id">
-          <button class="room-button" @click="openRoom(room)">{{ room.name || `Room ${room.id}` }}<span class="capacity-label">{{ ` Capacity: ${room.capacity}` || `` }}</span></button>
-        </li>
-      </ul>
+      <div class="page-header">
+        <h2>Rooms</h2>
+        <p class="page-subtitle">Pick a room to see its schedule.</p>
+      </div>
 
-      <h2>All Bookings</h2>
-      <table>
-        <thead>
-          <tr>
-            <th class="booking-heading">Title</th>
-            <th class="booking-heading">Room</th>
-            <th class="booking-heading">Start Time</th>
-            <th class="booking-heading">End Time</th>
-            <th></th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="booking in bookings" :key="booking.id">
-            <td>{{ booking.title }}</td>
-            <td>{{ roomMap[booking.roomId] || booking.roomId }}</td>
-            <td>{{ new Date(booking.startTime).toLocaleString() }}</td>
-            <td>{{ new Date(booking.endTime).toLocaleString() }}</td>
-            <td><button class="edit-button" @click="editBooking(booking)">Edit booking</button></td>
-            <td><button class="delete-button" @click="showDeleteModal(booking)">Delete</button></td>
-          </tr>
-        </tbody>
-      </table>
-      <button @click="router.push({ name: 'create-booking' })">Create Booking</button>
+      <div class="room-grid">
+        <button
+          v-for="room in rooms"
+          :key="room.id"
+          class="room-card"
+          @click="openRoom(room)"
+        >
+          <span class="room-name">{{ room.name || `Room ${room.id}` }}</span>
+          <span class="badge">Capacity {{ room.capacity }}</span>
+        </button>
+      </div>
+
+      <div class="page-header section-gap booking-header">
+        <div>
+          <h2>All Bookings</h2>
+          <p class="page-subtitle">Everything on the calendar across every room.</p>
+        </div>
+        <button class="btn btn-primary" @click="router.push({ name: 'create-booking' })">+ Create booking</button>
+      </div>
+
+      <div v-if="bookings.length" class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Room</th>
+              <th>Start Time</th>
+              <th>End Time</th>
+              <th></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="booking in bookings" :key="booking.id">
+              <td>{{ booking.title }}</td>
+              <td>{{ booking.roomName || booking.roomId }}</td>
+              <td>{{ new Date(booking.startTime).toLocaleString() }}</td>
+              <td>{{ new Date(booking.endTime).toLocaleString() }}</td>
+              <td><button class="btn-sm" @click="editBooking(booking)">Edit</button></td>
+              <td><button class="btn-sm btn-danger" @click="showDeleteModal(booking)">Delete</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p v-else class="loading-text">No bookings yet — create the first one.</p>
 
       <DeleteConfirmModal
         :show="Boolean(bookingToDelete)"
@@ -126,47 +138,50 @@ const deleteDescription = computed(() => {
 </template>
 
 <style scoped>
-.error { color: #c92a2a; }
-
-.room-button {
-  font-size: 1.5rem;
-  border: none;
-
-}
-.room-button:hover {
-  background: rgba(77, 98, 119, 0.08);
-}
-.capacity-label {
-  color: var(--color-text);
-  font-size: 1rem;
+.room-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
 }
 
-h2 {
-  padding-top: 1rem;
-}
-td {
-  padding: 0 1rem;
-}
-th {
-  padding: 0 1rem;
-  border-top: 1px solid #ccc;
-  border-bottom: 1px solid #ccc;
-}
-table {
-  padding: 1rem 0;
-  border-collapse: collapse;
-  table-layout: auto;
-  width: auto;
-  margin: 0;
-}
-
-td,
-th {
-  white-space: normal;
-}
-
-.booking-heading {
+.room-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  background: linear-gradient(180deg, var(--c-surface-1), var(--c-surface-0));
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-md);
+  padding: 1.1rem 1.25rem;
   text-align: left;
+  color: var(--c-text);
+  transition: border-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
+.room-card:hover {
+  border-color: var(--c-blue-400);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-elevated);
+  background: linear-gradient(180deg, var(--c-surface-1), var(--c-surface-0));
+  color: var(--c-text);
+}
+
+.room-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.booking-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+  .booking-header {
+    align-items: flex-start;
+  }
+}
 </style>

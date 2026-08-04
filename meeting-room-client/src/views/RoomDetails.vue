@@ -67,29 +67,40 @@ const deleteDescription = computed(() => {
 </script>
 
 <template>
-  <section>
-    <p v-if="loading">Loading room details…</p>
+  <section class="page-container">
+    <p v-if="loading" class="loading-text">Loading room details…</p>
     <p v-if="error" class="error">{{ error }}</p>
 
     <section v-if="!loading && !error">
-      <h2>{{ room.name || `Room ${room.id}` }}</h2>
-      <h3>Capacity: {{ room.capacity }}</h3>
-      <h3>Bookings for this room</h3>
-      <ul>
-        <li v-for="b in bookings" :key="b.id">
-          <div class="booking-item">
-            <div class="booking-details">
-              <strong>{{ b.title }}</strong>
+      <div class="card room-summary">
+        <div>
+          <h2>{{ room.name || `Room ${room.id}` }}</h2>
+          <span class="badge">Capacity {{ room.capacity }}</span>
+        </div>
+        <button class="btn btn-primary" @click="router.push({ name: 'create-booking-room', params: { id: room.id } })">
+          + Create booking
+        </button>
+      </div>
+
+      <div class="page-header section-gap">
+        <h2>Bookings for this room</h2>
+      </div>
+
+      <ul v-if="bookings.length" class="booking-list">
+        <li v-for="b in bookings" :key="b.id" class="booking-item">
+          <div class="booking-details">
+            <strong>{{ b.title }}</strong>
+            <div class="booking-time">
+              {{ new Date(b.startTime).toLocaleString() }} — {{ new Date(b.endTime).toLocaleString() }}
             </div>
-            <div> — {{ new Date(b.startTime).toLocaleString() }} to {{ new Date(b.endTime).toLocaleString() }}</div>
-            <div class="booking-actions">
-              <button @click="router.push({ name: 'edit-booking', params: { id: b.id } })">Edit booking</button>
-              <button @click="showDeleteModal(b)">Delete</button>
-            </div>
+          </div>
+          <div class="booking-actions">
+            <button class="btn-sm" @click="router.push({ name: 'edit-booking', params: { id: b.id } })">Edit</button>
+            <button class="btn-sm btn-danger" @click="showDeleteModal(b)">Delete</button>
           </div>
         </li>
       </ul>
-      <button @click="router.push({ name: 'create-booking', params: { id: room.id } })">Create Booking</button>
+      <p v-else class="loading-text">No bookings for this room yet.</p>
 
       <DeleteConfirmModal
         :show="Boolean(bookingToDelete)"
@@ -105,23 +116,50 @@ const deleteDescription = computed(() => {
 </template>
 
 <style scoped>
-.error { color: #c92a2a; }
-
-ul {
-  border-top: 1px solid #ccc;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
-  width: max-content;
+.room-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
+
+.room-summary h2 {
+  margin-bottom: 0.4rem;
+}
+
+.booking-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
 .booking-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
+  background: var(--c-surface-0);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  flex-wrap: wrap;
+  transition: border-color var(--transition-fast);
+}
+
+.booking-item:hover {
+  border-color: var(--c-border-strong);
 }
 
 .booking-details {
   flex: 1;
+  min-width: 200px;
+}
+
+.booking-time {
+  color: var(--c-text-muted);
+  font-size: 0.85rem;
+  margin-top: 0.2rem;
 }
 
 .booking-actions {

@@ -63,27 +63,35 @@ const handleCancel = () => {
 </script>
 
 <template>
-  <section>
-    <p v-if="loading">Loading booking…</p>
+  <section class="page-container form-page">
+    <div class="page-header">
+      <h2>Edit booking</h2>
+      <p class="page-subtitle">Update the details of this booking.</p>
+    </div>
+
+    <p v-if="loading" class="loading-text">Loading booking…</p>
     <div v-if="errors.length" class="errors">
       <ul>
         <li v-for="(err, idx) in errors" :key="idx">{{ err }}</li>
       </ul>
     </div>
 
-    <BookingForm
-      v-if="!loading"
-      :initialForm="initialForm"
-      :rooms="rooms"
-      :allBookings="allBookings"
-      :bookingId="id"
-      submitLabel="Save"
-      @submit="handleSubmit"
-      @cancel="handleCancel"
-    />
+    <div v-if="!loading" class="card">
+      <BookingForm
+        :initialForm="initialForm"
+        :rooms="rooms"
+        :allBookings="allBookings"
+        :bookingId="id"
+        submitLabel="Save"
+        @submit="handleSubmit"
+        @cancel="handleCancel"
+      />
+    </div>
   </section>
 </template>
 
 <style scoped>
-.errors { color: #c92a2a; margin-bottom: 1rem }
+.form-page {
+  max-width: 640px;
+}
 </style>

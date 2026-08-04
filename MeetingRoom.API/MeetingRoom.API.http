@@ -1,6 +1,0 @@
-@MeetingRoom.API_HostAddress = http://localhost:5265
-
-GET {{MeetingRoom.API_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

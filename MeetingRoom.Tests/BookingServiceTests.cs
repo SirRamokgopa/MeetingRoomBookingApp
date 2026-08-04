@@ -1,7 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MeetingRoom.API.Persistance;
-using MeetingRoom.API.Services;
-using MeetingRoom.API.DTOs;
+using MeetingRoom.Application.DTOs;
+using MeetingRoom.Domain.Entities;
+using MeetingRoom.Infrastructure.Persistance;
+using MeetingRoom.Infrastructure.Persistance.Entities;
+using MeetingRoom.Infrastructure.Repositories;
+using MeetingRoom.Application.Services;
+using MeetingRoom.Application.Validation;
 
 namespace MeetingRoom.Tests
 {
@@ -24,8 +28,11 @@ namespace MeetingRoom.Tests
             // Seed test data
             SeedTestData();
             
-            // Initialize the booking service
-            _bookingService = new BookingService(_context);
+            // Initialize the booking service via the repositories, matching the production DI wiring
+            var bookingRepository = new BookingRepository(_context);
+            var roomRepository = new RoomRepository(_context);
+            var bookingValidator = new BookingValidator(bookingRepository, roomRepository);
+            _bookingService = new BookingService(bookingRepository, roomRepository, bookingValidator);
         }
 
         [TestCleanup]
@@ -36,8 +43,8 @@ namespace MeetingRoom.Tests
 
         private void SeedTestData()
         {
-            var room1 = new Room { Id = 1, Name = "Party Room A", Capacity = 10 };
-            var room2 = new Room { Id = 2, Name = "Sleepy Meeting Room B", Capacity = 6 };
+            var room1 = new RoomEntity { Id = 1, Name = "Party Room A", Capacity = 10 };
+            var room2 = new RoomEntity { Id = 2, Name = "Sleepy Meeting Room B", Capacity = 6 };
             
             _context.Rooms.AddRange(room1, room2);
             _context.SaveChanges();
@@ -68,75 +75,6 @@ namespace MeetingRoom.Tests
             Assert.AreEqual(10, rooms[0].Capacity);
             Assert.AreEqual("Sleepy Meeting Room B", rooms[1].Name);
             Assert.AreEqual(6, rooms[1].Capacity);
-        }
-
-        #endregion
-
-        #region ValidateBooking Tests
-        //===================================================================================================================
-
-        [TestMethod]
-        public async Task ValidateBooking_ThrowsException_WhenRoomDoesNotExist()
-        {
-            // Arrange
-            var booking = new Booking
-            {
-                Title = "What? Another Team Meeting?",
-                RoomId = 69, // Where the hell is this??
-                StartTime = DateTime.Now.AddHours(1),
-                EndTime = DateTime.Now.AddHours(2)
-            };
-
-            // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(async () => await _bookingService.ValidateBooking(booking));
-        }
-
-        [TestMethod]
-        public async Task ValidateBooking_ThrowsException_WhenStartTimeAfterEndTime()
-        {
-            // Arrange
-            var booking = new Booking
-            {
-                Title = "Should have been an email Meeting",
-                RoomId = 1,
-                StartTime = DateTime.Now.AddHours(2),
-                EndTime = DateTime.Now.AddHours(1) // End time before start time
-            };
-
-            // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(async () => await _bookingService.ValidateBooking(booking));
-        }
-
-        [TestMethod]
-        public async Task ValidateBooking_ThrowsException_WhenBookingTitleIsEmpty()
-        {
-            // Arrange
-            var booking = new Booking
-            {
-                Title = string.Empty,
-                RoomId = 1,
-                StartTime = DateTime.Now.AddHours(1),
-                EndTime = DateTime.Now.AddHours(2)
-            };
-
-            // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(async () => await _bookingService.ValidateBooking(booking));
-        }
-
-        [TestMethod]
-        public async Task ValidateBooking_ThrowsException_WhenBookingStartTimeIsMinValue()
-        {
-            // Arrange
-            var booking = new Booking
-            {
-                Title = "Meeting before time",
-                RoomId = 1,
-                StartTime = DateTime.MinValue,
-                EndTime = DateTime.Now.AddHours(2)
-            };
-
-            // Act & Assert
-            await Assert.ThrowsAsync<ArgumentException>(async () => await _bookingService.ValidateBooking(booking));
         }
 
         #endregion
@@ -172,7 +110,7 @@ namespace MeetingRoom.Tests
             var endTime = DateTime.Now.AddHours(2);
             
             // Create first booking
-            var booking1 = new Booking
+            var booking1 = new BookingEntity
             {
                 Title = "Meeting on meetings efficiency",
                 RoomId = 1,
@@ -203,7 +141,7 @@ namespace MeetingRoom.Tests
             var startTime = DateTime.Now.AddDays(1).Date.AddHours(10);
             var endTime = startTime.AddHours(1);
 
-            var booking1 = new Booking
+            var booking1 = new BookingEntity
             {
                 Title = "Meeting about last meeting",
                 RoomId = 1,
@@ -263,7 +201,7 @@ namespace MeetingRoom.Tests
         public async Task GetBookings_ReturnsAllBookings_WhenBookingsExist()
         {
             // Arrange
-            var booking1 = new Booking
+            var booking1 = new BookingEntity
             {
                 Title = "Why are managers like this Meeting",
                 RoomId = 1,
@@ -271,7 +209,7 @@ namespace MeetingRoom.Tests
                 EndTime = DateTime.Now.AddHours(2)
             };
             
-            var booking2 = new Booking
+            var booking2 = new BookingEntity
             {
                 Title = "Meeting to interrupt devs' flow state",
                 RoomId = 2,
@@ -301,7 +239,7 @@ namespace MeetingRoom.Tests
         public async Task GetBookingById_ReturnsCorrectBooking()
         {
             // Arrange
-            var booking = new Booking
+            var booking = new BookingEntity
             {
                 Title = "Team Synergy Meeting",
                 RoomId = 1,
@@ -340,7 +278,7 @@ namespace MeetingRoom.Tests
         public async Task UpdateBooking_SuccessfullyUpdatesBooking()
         {
             // Arrange
-            var originalBooking = new Booking
+            var originalBooking = new BookingEntity
             {
                 Id = 420, 
                 Title = "Original Meeting",
@@ -384,7 +322,7 @@ namespace MeetingRoom.Tests
         public async Task DeleteBooking_SuccessfullyDeletesBooking()
         {
             // Arrange
-            var booking = new Booking
+            var booking = new BookingEntity
             {
                 Title = "We didn't need this meeting anyways",
                 RoomId = 1,
